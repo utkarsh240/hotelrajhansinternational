@@ -17,21 +17,21 @@ interface GalleryImage {
 const galleryImages: GalleryImage[] = [
   // Reception
   {
-    src: "/images/reception/Reception001.jpg",
+    src: "/ranjhans/images/reception/Reception001.jpg",
     category: "reception",
     title: "Grand Reception Lobby",
     description: "Welcome to a world of luxury and dedicated service.",
     size: "wide",
   },
   {
-    src: "/images/reception/Reception003.jpg",
+    src: "/ranjhans/images/reception/Reception003.jpg",
     category: "reception",
     title: "Lobby Seating Area",
     description: "Elegant and comfortable waiting lounge for our guests.",
     size: "square",
   },
   {
-    src: "/images/reception/Reception005.jpg",
+    src: "/ranjhans/images/reception/Reception005.jpg",
     category: "reception",
     title: "Reception Concierge",
     description: "Our professional hosts available 24/7.",
@@ -40,35 +40,35 @@ const galleryImages: GalleryImage[] = [
 
   // Rooms
   {
-    src: "/images/suite/SR001.jpg",
+    src: "/ranjhans/images/suite/SR001.jpg",
     category: "rooms",
     title: "Royal Suite Living Room",
     description: "Spacious luxury with premium furnishings and ambient lighting.",
     size: "wide",
   },
   {
-    src: "/images/suite/SR002.jpg",
+    src: "/ranjhans/images/suite/SR002.jpg",
     category: "rooms",
     title: "Royal Suite Master Bedroom",
     description: "Pocket spring king bed with exquisite fine linen.",
     size: "tall",
   },
   {
-    src: "/images/executive/Room-001.jpg",
+    src: "/ranjhans/images/executive/Room-001.jpg",
     category: "rooms",
     title: "Executive Suite",
     description: "Tailored for the modern corporate traveler.",
     size: "square",
   },
   {
-    src: "/images/deluxe/Delux001.jpg",
+    src: "/ranjhans/images/deluxe/Delux001.jpg",
     category: "rooms",
     title: "Deluxe Twin Room",
     description: "Comfort and sophistication combined in a serene space.",
     size: "square",
   },
   {
-    src: "/images/suite/SR005.jpg",
+    src: "/ranjhans/images/suite/SR005.jpg",
     category: "rooms",
     title: "Royal Suite Lounge",
     description: "An elegant space to entertain guests or unwind.",
@@ -77,21 +77,21 @@ const galleryImages: GalleryImage[] = [
 
   // Restaurant
   {
-    src: "/images/restaurant/R001.jpg",
+    src: "/ranjhans/images/restaurant/R001.jpg",
     category: "restaurant",
     title: "The Regent Dining Room",
     description: "Fine dining ambiance with international and local cuisines.",
     size: "wide",
   },
   {
-    src: "/images/restaurant/R004.jpg",
+    src: "/ranjhans/images/restaurant/R004.jpg",
     category: "restaurant",
     title: "Culinary Masterpieces",
     description: "Expertly crafted gourmet cuisines by our signature chefs.",
     size: "square",
   },
   {
-    src: "/images/restaurant/R005.jpg",
+    src: "/ranjhans/images/restaurant/R005.jpg",
     category: "restaurant",
     title: "Exquisite Table Settings",
     description: "Attention to every detail for a memorable dining experience.",
@@ -100,21 +100,21 @@ const galleryImages: GalleryImage[] = [
 
   // Parlour / Salon
   {
-    src: "/images/parlour/BP001.jpg",
+    src: "/ranjhans/images/parlour/BP001.jpg",
     category: "services",
     title: "Rajhans Ladies Beauty Parlour",
     description: "Premium beauty treatments and styling in a serene setting.",
     size: "tall",
   },
   {
-    src: "/images/parlour/BP006.jpg",
+    src: "/ranjhans/images/parlour/BP006.jpg",
     category: "services",
     title: "Grooming & Styling Station",
     description: "State-of-the-art facilities for hair care and styling.",
     size: "wide",
   },
   {
-    src: "/images/parlour/BP008.jpg",
+    src: "/ranjhans/images/parlour/BP008.jpg",
     category: "services",
     title: "Manicure & Treatment Suite",
     description: "Dedicated pampering and therapy services.",
@@ -123,14 +123,14 @@ const galleryImages: GalleryImage[] = [
 
   // Ice Cream Parlour
   {
-    src: "/images/ice-cream/ICP001.jpg",
+    src: "/ranjhans/images/ice-cream/ICP001.jpg",
     category: "icecream",
     title: "The Ice Cream Parlour",
     description: "Delightful dessert destination for families and guests.",
     size: "wide",
   },
   {
-    src: "/images/ice-cream/ICP004.jpg",
+    src: "/ranjhans/images/ice-cream/ICP004.jpg",
     category: "icecream",
     title: "Artisanal Ice Creams",
     description: "Vibrant flavors and delicious sundaes crafted daily.",
@@ -139,21 +139,21 @@ const galleryImages: GalleryImage[] = [
 
   // Dormitory
   {
-    src: "/images/dormitory/DM001.jpg",
+    src: "/ranjhans/images/dormitory/DM001.jpg",
     category: "dormitory",
     title: "Imperial Dormitory Hall",
     description: "High-end corporate group accommodations.",
     size: "wide",
   },
   {
-    src: "/images/dormitory/DM004.jpg",
+    src: "/ranjhans/images/dormitory/DM004.jpg",
     category: "dormitory",
     title: "Personal Storage & Lockers",
     description: "Safe and spacious storage for group travel needs.",
     size: "tall",
   },
   {
-    src: "/images/dormitory/DM005.jpg",
+    src: "/ranjhans/images/dormitory/DM005.jpg",
     category: "dormitory",
     title: "Clean Grooming Lavatories",
     description: "Pristine, hygienic washrooms for group sections.",

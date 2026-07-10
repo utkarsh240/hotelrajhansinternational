@@ -31,17 +31,17 @@ import ImageGallery from "@/components/ImageGallery";
 // Hero Slideshow images (reception, suite, restaurant)
 const heroSlides = [
   {
-    src: "/images/reception/Reception001.jpg",
+    src: "/ranjhans/images/reception/Reception001.jpg",
     title: "A Sanctuary of Refined Luxury",
     subtitle: "Experience unparalleled 5-star service in the heart of Bhagalpur.",
   },
   {
-    src: "/images/suite/SR001.jpg",
+    src: "/ranjhans/images/suite/SR001.jpg",
     title: "Elegant Spaces. Majestic Stays.",
     subtitle: "Immerse yourself in our beautifully crafted suites designed for ultimate comfort.",
   },
   {
-    src: "/images/restaurant/R001.jpg",
+    src: "/ranjhans/images/restaurant/R001.jpg",
     title: "A Culinary Journey Awaits",
     subtitle: "Savor exquisite delicacies prepared by our master chefs at The Regent.",
   },
@@ -422,7 +422,7 @@ export default function Home() {
           <div className="lg:col-span-6 grid grid-cols-12 gap-4">
             <div className="col-span-8 relative h-[380px] rounded-2xl overflow-hidden border border-gold-400/10">
               <Image
-                src="/images/reception/Reception002.jpg"
+                src="/ranjhans/images/reception/Reception002.jpg"
                 alt="Hotel Rajhans Reception"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
@@ -432,7 +432,7 @@ export default function Home() {
             </div>
             <div className="col-span-4 relative h-[180px] self-end rounded-2xl overflow-hidden border border-gold-400/10">
               <Image
-                src="/images/restaurant/R003.jpg"
+                src="/ranjhans/images/restaurant/R003.jpg"
                 alt="Fine Dining R003"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
@@ -442,7 +442,7 @@ export default function Home() {
             </div>
             <div className="col-span-4 relative h-[180px] -mt-36 rounded-2xl overflow-hidden border border-gold-400/10">
               <Image
-                src="/images/suite/SR003.jpg"
+                src="/ranjhans/images/suite/SR003.jpg"
                 alt="Royal Suite Room View"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
@@ -452,7 +452,7 @@ export default function Home() {
             </div>
             <div className="col-span-8 relative h-[250px] mt-4 rounded-2xl overflow-hidden border border-gold-400/10">
               <Image
-                src="/images/executive/Room-002.jpg"
+                src="/ranjhans/images/executive/Room-002.jpg"
                 alt="Executive Room Bedroom View"
                 fill
                 className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
@@ -546,7 +546,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden flex flex-col border border-gold-400/10 group">
               <div className="relative h-[280px] w-full overflow-hidden">
                 <Image
-                  src="/images/executive/Room-001.jpg"
+                  src="/ranjhans/images/executive/Room-001.jpg"
                   alt="Executive Room"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -601,7 +601,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden flex flex-col border border-gold-400/10 group">
               <div className="relative h-[280px] w-full overflow-hidden">
                 <Image
-                  src="/images/deluxe/Delux001.jpg"
+                  src="/ranjhans/images/deluxe/Delux001.jpg"
                   alt="Deluxe Room"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -656,7 +656,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden flex flex-col border border-gold-400/15 group shadow-xl">
               <div className="relative h-[280px] w-full overflow-hidden">
                 <Image
-                  src="/images/suite/SR001.jpg"
+                  src="/ranjhans/images/suite/SR001.jpg"
                   alt="Royal Suite Room"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -765,7 +765,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/images/parlour/BP001.jpg"
+                  src="/ranjhans/images/parlour/BP001.jpg"
                   alt="Rajhans Ladies Beauty Parlour"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -801,7 +801,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/images/parlour/BP006.jpg"
+                  src="/ranjhans/images/parlour/BP006.jpg"
                   alt="Rajhans Saloon"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -837,7 +837,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/images/restaurant/R001.jpg"
+                  src="/ranjhans/images/restaurant/R001.jpg"
                   alt="The Regent Restaurant"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -873,7 +873,7 @@ export default function Home() {
             <div className="glass-card rounded-2xl overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/images/ice-cream/ICP001.jpg"
+                  src="/ranjhans/images/ice-cream/ICP001.jpg"
                   alt="Ice Cream Parlour"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
