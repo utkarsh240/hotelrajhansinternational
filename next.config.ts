@@ -5,9 +5,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // Note: If you are hosting on GitHub Pages under a subfolder (e.g. https://<username>.github.io/<repo-name>),
-  // you must add the repo name as basePath, like so:
-  // basePath: "/<repo-name>",
+  // Configured basePath for GitHub Pages deployment under the repository name '/ranjhans'
+  basePath: "/ranjhans",
 };
 
 export default nextConfig;
