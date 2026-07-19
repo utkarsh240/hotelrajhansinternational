@@ -35,12 +35,11 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate luxury booking reservation delay
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
       setBookingRef("HRJ-" + Math.floor(100000 + Math.random() * 900000));
-    }, 2000);
+    }, 350);
   };
 
   const handleClose = () => {
@@ -62,7 +61,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="absolute inset-0 bg-charcoal-950/80 backdrop-blur-md"
+            className="absolute inset-0 bg-cream/80 backdrop-blur-md"
           />
 
           {/* Modal Container */}
@@ -71,14 +70,14 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-gold-400/20 bg-charcoal-900 shadow-2xl z-10"
+            className="relative z-10 w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto overflow-x-hidden rounded-lg border border-gold-400/20 bg-cream-soft shadow-2xl"
           >
             {/* Elegant Top Gold Accent Line */}
             <div className="h-1.5 w-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600" />
 
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 p-2 text-gold-200/60 hover:text-gold-300 transition-colors rounded-full hover:bg-white/5"
+              className="absolute top-4 right-4 p-2 text-gold-200/60 hover:text-gold-300 transition-colors rounded-full hover:bg-brown-900/5"
               aria-label="Close modal"
             >
               <X className="h-5 w-5" />
@@ -88,10 +87,10 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
               <div className="p-6 md:p-8">
                 <div className="mb-6 text-center">
                   <h3 className="font-serif text-2xl md:text-3xl text-gold-300 tracking-wide">
-                    Begin Your Journey
+                    Book a room
                   </h3>
                   <p className="text-gold-200/60 text-xs tracking-widest uppercase mt-1">
-                    Hotel Rajhans International
+                    We&apos;ll confirm by phone or email
                   </p>
                 </div>
 
@@ -108,7 +107,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                         required
                         value={formData.checkIn}
                         onChange={handleChange}
-                        className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                        className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                       />
                     </div>
                     <div>
@@ -121,7 +120,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                         required
                         value={formData.checkOut}
                         onChange={handleChange}
-                        className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                        className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                       />
                     </div>
                   </div>
@@ -130,18 +129,18 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-widest text-gold-200/80 mb-1.5 flex items-center gap-1.5">
-                        <Home className="h-3.5 w-3.5 text-gold-400" /> Suite Category
+                        <Home className="h-3.5 w-3.5 text-gold-400" /> Room type
                       </label>
                       <select
                         name="roomType"
                         value={formData.roomType}
                         onChange={handleChange}
-                        className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                        className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                       >
                         <option value="executive">Executive Room (₹3,090 - ₹3,790)</option>
                         <option value="deluxe">Deluxe Room (₹3,790 - ₹4,490)</option>
                         <option value="royal">Royal Suite (₹5,190)</option>
-                        <option value="dormitory">Imperial Dormitory (Group Stay)</option>
+                        <option value="dormitory">Dormitory (Group stay)</option>
                       </select>
                     </div>
                     <div>
@@ -152,7 +151,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                         name="guests"
                         value={formData.guests}
                         onChange={handleChange}
-                        className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                        className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                       >
                         <option value="1">1 Guest</option>
                         <option value="2">2 Guests</option>
@@ -169,16 +168,16 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-widest text-gold-200/80 mb-1.5 flex items-center gap-1.5">
-                        <User className="h-3.5 w-3.5 text-gold-400" /> Guest Full Name
+                        <User className="h-3.5 w-3.5 text-gold-400" /> Full name
                       </label>
                       <input
                         type="text"
                         name="name"
-                        placeholder="e.g., Alexander Mercer"
+                        placeholder="Your name"
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                        className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                       />
                     </div>
 
@@ -190,11 +189,11 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                         <input
                           type="tel"
                           name="phone"
-                          placeholder="e.g., +91 98765 43210"
+                          placeholder="+91 98765 43210"
                           required
                           value={formData.phone}
                           onChange={handleChange}
-                          className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                          className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                         />
                       </div>
                       <div>
@@ -204,26 +203,26 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                         <input
                           type="email"
                           name="email"
-                          placeholder="e.g., contact@domain.com"
+                          placeholder="you@email.com"
                           required
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
+                          className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
                         />
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-widest text-gold-200/80 mb-1.5">
-                        Special Requests or Preferences
+                        Special requests
                       </label>
                       <textarea
                         name="specialRequests"
                         rows={2}
-                        placeholder="Dietary preferences, floor choice, transit assistance, court-work coordination..."
+                        placeholder="Early check-in, extra bed, station pickup..."
                         value={formData.specialRequests}
                         onChange={handleChange}
-                        className="w-full bg-charcoal-950 border border-gold-400/10 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm resize-none"
+                        className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm resize-none"
                       />
                     </div>
                   </div>
@@ -232,18 +231,18 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 hover:from-gold-700 hover:via-gold-500 hover:to-gold-700 text-charcoal-950 font-medium uppercase tracking-widest text-xs py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg shadow-gold-400/10 active:scale-[0.98] disabled:opacity-70 flex justify-center items-center gap-2 cursor-pointer"
+                      className="w-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 hover:from-gold-700 hover:via-gold-500 hover:to-gold-700 text-brown-900 font-medium uppercase tracking-widest text-xs py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg shadow-gold-400/10 active:scale-[0.98] disabled:opacity-70 flex justify-center items-center gap-2 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <>
-                          <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-charcoal-950" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-brown-900" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
-                          Securing Your Reservation...
+                          Submitting...
                         </>
                       ) : (
-                        "Request Luxury Suite Reservation"
+                        "Submit booking request"
                       )}
                     </button>
                   </div>
@@ -270,13 +269,22 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                 </div>
 
                 <h3 className="font-serif text-3xl text-gold-300 tracking-wide mb-3">
-                  Reservation Initiated
+                  Request received
                 </h3>
                 <p className="text-gold-200/80 max-w-md mx-auto text-sm leading-relaxed mb-6">
-                  Thank you, <span className="text-gold-100 font-semibold">{formData.name}</span>. Your enquiry for the <span className="text-gold-100 font-semibold">{formData.roomType === "royal" ? "Royal Suite" : formData.roomType === "deluxe" ? "Deluxe Room" : formData.roomType === "dormitory" ? "Imperial Dormitory" : "Executive Room"}</span> has been successfully logged.
+                  Thanks, <span className="text-gold-100 font-semibold">{formData.name}</span>. We&apos;ve noted your request for the{" "}
+                  <span className="text-gold-100 font-semibold">
+                    {formData.roomType === "royal"
+                      ? "Royal Suite"
+                      : formData.roomType === "deluxe"
+                      ? "Deluxe Room"
+                      : formData.roomType === "dormitory"
+                      ? "Dormitory"
+                      : "Executive Room"}
+                  </span>.
                 </p>
 
-                <div className="bg-charcoal-950 border border-gold-400/10 rounded-xl p-5 max-w-sm mx-auto mb-8 text-left space-y-2">
+                <div className="bg-paper border border-gold-400/20 rounded-lg p-5 max-w-sm mx-auto mb-8 text-left space-y-2">
                   <div className="flex justify-between text-xs text-gold-200/60 uppercase tracking-wider">
                     <span>Reference ID:</span>
                     <span className="text-gold-400 font-mono font-semibold">{bookingRef}</span>
@@ -293,7 +301,8 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
 
                 <div className="space-y-4 max-w-md mx-auto">
                   <p className="text-xs text-gold-200/50 leading-relaxed">
-                    Our reservation manager will review your preferences and contact you at <span className="text-gold-300">{formData.phone}</span> or <span className="text-gold-300">{formData.email}</span> within the next hour to finalize the arrangements.
+                    Our team will call <span className="text-gold-300">{formData.phone}</span> or email{" "}
+                    <span className="text-gold-300">{formData.email}</span> to confirm availability and rates.
                   </p>
                   
                   <div className="pt-2">
@@ -301,7 +310,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                       onClick={handleClose}
                       className="border border-gold-400/30 hover:border-gold-300 text-gold-300 hover:text-gold-200 font-medium uppercase tracking-widest text-xs py-3 px-8 rounded-lg transition-colors cursor-pointer"
                     >
-                      Return to Website
+                      Close
                     </button>
                   </div>
                 </div>
@@ -309,9 +318,9 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
             )}
 
             {/* Bottom Brand Bar */}
-            <div className="bg-charcoal-950 py-3 px-6 border-t border-gold-400/5 flex justify-between items-center text-[10px] text-gold-200/30 uppercase tracking-widest">
+            <div className="bg-cream py-3 px-6 border-t border-gold-400/5 flex justify-between items-center text-[10px] text-gold-200/30 uppercase tracking-widest">
               <span className="flex items-center gap-1">
-                <Award className="h-3 w-3 text-gold-400/50" /> Luxurious 5-Star Service
+                <Award className="h-3 w-3 text-gold-400/50" /> Hotel Rajhans International
               </span>
               <span>Est. 2018</span>
             </div>

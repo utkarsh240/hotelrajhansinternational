@@ -3,171 +3,127 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface GalleryImage {
   src: string;
   category: "rooms" | "restaurant" | "services" | "reception" | "icecream" | "dormitory";
-  title: string;
-  description: string;
+  alt: string;
   size: "square" | "tall" | "wide";
 }
 
-// Curated selection of high-quality images for the gallery
 const galleryImages: GalleryImage[] = [
-  // Reception
   {
     src: "/ranjhans/images/reception/Reception001.jpg",
     category: "reception",
-    title: "Grand Reception Lobby",
-    description: "Welcome to a world of luxury and dedicated service.",
+    alt: "Hotel lobby",
     size: "wide",
   },
   {
     src: "/ranjhans/images/reception/Reception003.jpg",
     category: "reception",
-    title: "Lobby Seating Area",
-    description: "Elegant and comfortable waiting lounge for our guests.",
+    alt: "Lobby seating",
     size: "square",
   },
   {
     src: "/ranjhans/images/reception/Reception005.jpg",
     category: "reception",
-    title: "Reception Concierge",
-    description: "Our professional hosts available 24/7.",
+    alt: "Reception desk",
     size: "tall",
   },
-
-  // Rooms
   {
     src: "/ranjhans/images/suite/SR001.jpg",
     category: "rooms",
-    title: "Royal Suite Living Room",
-    description: "Spacious luxury with premium furnishings and ambient lighting.",
+    alt: "Royal suite living room",
     size: "wide",
   },
   {
     src: "/ranjhans/images/suite/SR002.jpg",
     category: "rooms",
-    title: "Royal Suite Master Bedroom",
-    description: "Pocket spring king bed with exquisite fine linen.",
+    alt: "Royal suite bedroom",
     size: "tall",
   },
   {
     src: "/ranjhans/images/executive/Room-001.jpg",
     category: "rooms",
-    title: "Executive Suite",
-    description: "Tailored for the modern corporate traveler.",
+    alt: "Executive room",
     size: "square",
   },
   {
     src: "/ranjhans/images/deluxe/Delux001.jpg",
     category: "rooms",
-    title: "Deluxe Twin Room",
-    description: "Comfort and sophistication combined in a serene space.",
+    alt: "Deluxe room",
     size: "square",
   },
   {
     src: "/ranjhans/images/suite/SR005.jpg",
     category: "rooms",
-    title: "Royal Suite Lounge",
-    description: "An elegant space to entertain guests or unwind.",
+    alt: "Royal suite lounge",
     size: "wide",
   },
-
-  // Restaurant
   {
     src: "/ranjhans/images/restaurant/R001.jpg",
     category: "restaurant",
-    title: "The Regent Dining Room",
-    description: "Fine dining ambiance with international and local cuisines.",
+    alt: "Takshshila restaurant",
     size: "wide",
   },
   {
     src: "/ranjhans/images/restaurant/R004.jpg",
     category: "restaurant",
-    title: "Culinary Masterpieces",
-    description: "Expertly crafted gourmet cuisines by our signature chefs.",
+    alt: "Restaurant dining",
     size: "square",
   },
   {
     src: "/ranjhans/images/restaurant/R005.jpg",
     category: "restaurant",
-    title: "Exquisite Table Settings",
-    description: "Attention to every detail for a memorable dining experience.",
+    alt: "Restaurant seating",
     size: "tall",
   },
-
-  // Parlour / Salon
   {
     src: "/ranjhans/images/parlour/BP001.jpg",
     category: "services",
-    title: "Rajhans Ladies Beauty Parlour",
-    description: "Premium beauty treatments and styling in a serene setting.",
+    alt: "Beauty parlour",
     size: "tall",
-  },
-  {
-    src: "/ranjhans/images/parlour/BP006.jpg",
-    category: "services",
-    title: "Grooming & Styling Station",
-    description: "State-of-the-art facilities for hair care and styling.",
-    size: "wide",
   },
   {
     src: "/ranjhans/images/parlour/BP008.jpg",
     category: "services",
-    title: "Manicure & Treatment Suite",
-    description: "Dedicated pampering and therapy services.",
+    alt: "Beauty parlour interior",
     size: "square",
   },
-
-  // Ice Cream Parlour
   {
     src: "/ranjhans/images/ice-cream/ICP001.jpg",
     category: "icecream",
-    title: "The Ice Cream Parlour",
-    description: "Delightful dessert destination for families and guests.",
+    alt: "Ice cream parlour",
     size: "wide",
   },
   {
     src: "/ranjhans/images/ice-cream/ICP004.jpg",
     category: "icecream",
-    title: "Artisanal Ice Creams",
-    description: "Vibrant flavors and delicious sundaes crafted daily.",
+    alt: "Ice cream display",
     size: "square",
   },
-
-  // Dormitory
   {
     src: "/ranjhans/images/dormitory/DM001.jpg",
     category: "dormitory",
-    title: "Imperial Dormitory Hall",
-    description: "High-end corporate group accommodations.",
+    alt: "Dormitory hall",
     size: "wide",
   },
   {
     src: "/ranjhans/images/dormitory/DM004.jpg",
     category: "dormitory",
-    title: "Personal Storage & Lockers",
-    description: "Safe and spacious storage for group travel needs.",
+    alt: "Dormitory lockers",
     size: "tall",
-  },
-  {
-    src: "/ranjhans/images/dormitory/DM005.jpg",
-    category: "dormitory",
-    title: "Clean Grooming Lavatories",
-    description: "Pristine, hygienic washrooms for group sections.",
-    size: "square",
   },
 ];
 
 const categories = [
-  { id: "all", label: "All Works" },
-  { id: "reception", label: "Lobby & Lobby" },
-  { id: "rooms", label: "Rooms & Suites" },
-  { id: "restaurant", label: "Dining" },
-  { id: "services", label: "Wellness & Saloon" },
-  { id: "icecream", label: "Ice Cream Parlour" },
+  { id: "all", label: "All" },
+  { id: "reception", label: "Lobby" },
+  { id: "rooms", label: "Rooms" },
+  { id: "restaurant", label: "Restaurant" },
+  { id: "services", label: "Parlour & Saloon" },
+  { id: "icecream", label: "Ice cream" },
   { id: "dormitory", label: "Dormitory" },
 ] as const;
 
@@ -204,7 +160,7 @@ export default function ImageGallery() {
             onClick={() => setActiveFilter(cat.id)}
             className={`relative px-4 py-2 text-xs uppercase tracking-widest transition-all duration-300 rounded-full cursor-pointer ${
               activeFilter === cat.id
-                ? "text-charcoal-950 font-medium"
+                ? "text-brown-900 font-medium"
                 : "text-gold-200/60 hover:text-gold-300"
             }`}
           >
@@ -235,7 +191,7 @@ export default function ImageGallery() {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.4 }}
               onClick={() => openLightbox(img.src)}
-              className={`group relative overflow-hidden rounded-2xl cursor-pointer border border-gold-400/10 ${
+              className={`group relative overflow-hidden rounded-lg cursor-pointer border border-gold-400/10 ${
                 img.size === "tall"
                   ? "row-span-2"
                   : img.size === "wide"
@@ -245,41 +201,12 @@ export default function ImageGallery() {
             >
               <Image
                 src={img.src}
-                alt={img.title}
+                alt={img.alt}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 loading="lazy"
               />
-
-              {/* Gold Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-
-              {/* Reveal details on hover */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 flex flex-col justify-end h-1/2">
-                <div className="flex items-center justify-between text-gold-300 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
-                  <span className="text-[10px] uppercase tracking-widest font-mono">
-                    {img.category === "reception"
-                      ? "Lobby"
-                      : img.category === "rooms"
-                      ? "Suites"
-                      : img.category === "restaurant"
-                      ? "Dining"
-                      : img.category === "services"
-                      ? "Wellness"
-                      : img.category === "icecream"
-                      ? "Desserts"
-                      : "Dormitory"}
-                  </span>
-                  <Maximize2 className="h-4 w-4" />
-                </div>
-                <h4 className="font-serif text-lg text-gold-50 tracking-wide font-medium leading-snug">
-                  {img.title}
-                </h4>
-                <p className="text-gold-200/60 text-xs mt-1.5 line-clamp-2 max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                  {img.description}
-                </p>
-              </div>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -288,10 +215,10 @@ export default function ImageGallery() {
       {/* Lightbox Modal */}
       <AnimatePresence>
         {lightboxIndex !== null && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal-950/95 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-cream/95 backdrop-blur-md p-4">
             <button
               onClick={closeLightbox}
-              className="absolute top-4 right-4 p-2 text-gold-200/60 hover:text-gold-300 rounded-full hover:bg-white/5 cursor-pointer z-50"
+              className="absolute top-4 right-4 p-2 text-gold-200/60 hover:text-gold-300 rounded-full hover:bg-brown-900/5 cursor-pointer z-50"
             >
               <X className="h-6 w-6" />
             </button>
@@ -299,7 +226,7 @@ export default function ImageGallery() {
             {/* Left Nav */}
             <button
               onClick={() => navigateLightbox("prev")}
-              className="absolute left-4 p-3 text-gold-200/60 hover:text-gold-300 hover:bg-white/5 rounded-full cursor-pointer z-40 transition-colors"
+              className="absolute left-4 p-3 text-gold-200/60 hover:text-gold-300 hover:bg-brown-900/5 rounded-full cursor-pointer z-40 transition-colors"
             >
               <ChevronLeft className="h-8 w-8" />
             </button>
@@ -307,7 +234,7 @@ export default function ImageGallery() {
             {/* Right Nav */}
             <button
               onClick={() => navigateLightbox("next")}
-              className="absolute right-4 p-3 text-gold-200/60 hover:text-gold-300 hover:bg-white/5 rounded-full cursor-pointer z-40 transition-colors"
+              className="absolute right-4 p-3 text-gold-200/60 hover:text-gold-300 hover:bg-brown-900/5 rounded-full cursor-pointer z-40 transition-colors"
             >
               <ChevronRight className="h-8 w-8" />
             </button>
@@ -319,30 +246,17 @@ export default function ImageGallery() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className="relative max-w-5xl w-full h-[70vh] flex flex-col items-center justify-center"
+              className="relative max-w-5xl w-full h-[80vh] flex items-center justify-center"
             >
               <div className="relative w-full h-full">
                 <Image
                   src={filteredImages[lightboxIndex].src}
-                  alt={filteredImages[lightboxIndex].title}
+                  alt={filteredImages[lightboxIndex].alt}
                   fill
                   className="object-contain"
                   sizes="(max-width: 1200px) 100vw, 1200px"
                   priority
                 />
-              </div>
-
-              {/* Caption */}
-              <div className="text-center mt-6 max-w-2xl px-4 space-y-1">
-                <p className="text-[10px] text-gold-400 uppercase tracking-widest font-mono">
-                  Image {lightboxIndex + 1} of {filteredImages.length}
-                </p>
-                <h4 className="font-serif text-xl text-gold-100">
-                  {filteredImages[lightboxIndex].title}
-                </h4>
-                <p className="text-gold-200/60 text-sm">
-                  {filteredImages[lightboxIndex].description}
-                </p>
               </div>
             </motion.div>
           </div>

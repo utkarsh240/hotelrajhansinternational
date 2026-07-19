@@ -17,13 +17,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Hotel Rajhans International | Luxury 5-Star Hotel in Bhagalpur",
-  description: "Experience the pinnacle of luxury, refined comfort, and five-star hospitality at Hotel Rajhans International, Bhagalpur. Located at Kachari Chowk, MG Road. ISO 9001:2015 Certified.",
-  keywords: ["Hotel Rajhans International", "Luxury Hotel Bhagalpur", "5 Star Hotel Bihar", "Rajhans Bhagalpur", "Best Hotel in Bhagalpur", "Takshshila Regency"],
+  title: "Hotel Rajhans International | Bhagalpur",
+  description: "Rooms, dining, and parking at Kachari Chowk, MG Road, Bhagalpur. Executive, Deluxe, and Royal Suite rooms. ISO 9001:2015 certified.",
+  keywords: ["Hotel Rajhans International", "Hotel Bhagalpur", "MG Road Bhagalpur", "Rajhans Bhagalpur", "Takshshila Regency"],
   authors: [{ name: "Hotel Rajhans International" }],
   openGraph: {
-    title: "Hotel Rajhans International | Luxury 5-Star Hotel in Bhagalpur",
-    description: "Experience the pinnacle of luxury, refined comfort, and five-star hospitality at Hotel Rajhans International, Bhagalpur.",
+    title: "Hotel Rajhans International | Bhagalpur",
+    description: "Rooms, dining, and parking at Kachari Chowk, MG Road, Bhagalpur.",
     url: "https://www.hotelrajhansinternational.com",
     siteName: "Hotel Rajhans International",
     locale: "en_US",
@@ -41,7 +41,7 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-charcoal-950 text-gold-50 selection:bg-gold-300 selection:text-charcoal-950">
+      <body className="min-h-full flex flex-col bg-cream text-gold-50 selection:bg-gold-300 selection:text-brown-900">
         {children}
       </body>
     </html>
