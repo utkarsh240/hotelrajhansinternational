@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+export const dynamic = "force-static";
+
 export async function GET() {
   try {
     const reviews = await prisma.review.findMany({

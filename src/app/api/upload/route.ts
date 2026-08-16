@@ -3,6 +3,8 @@ import { getSession } from "@/lib/auth";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = "force-static";
+
 export async function POST(request: Request) {
   try {
     const session = await getSession();

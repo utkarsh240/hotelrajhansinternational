@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createCashfreeOrder, getCashfreeEnvironment } from "@/lib/cashfree";
 
+export const dynamic = "force-static";
+
 export async function POST(request: Request) {
   try {
     const { bookingId } = await request.json();

@@ -5,6 +5,8 @@ import { sendEmailNotification } from "@/lib/mailer";
 import { generateConfirmationEmailHTML } from "@/lib/invoice";
 import { syncBookingToGoogleSheet } from "@/lib/googlesheets";
 
+export const dynamic = "force-static";
+
 export async function POST(request: Request) {
   try {
     const { bookingId, orderId } = await request.json();

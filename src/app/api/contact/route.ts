@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { syncInquiryToGoogleSheet } from "@/lib/googlesheets";
 
+export const dynamic = "force-static";
+
 export async function GET() {
   try {
     const session = await getSession();
