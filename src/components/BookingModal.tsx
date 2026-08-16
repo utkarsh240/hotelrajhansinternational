@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Users, Home, User, Phone, Mail, Award, CheckCircle, CreditCard, FileText } from "lucide-react";
 
@@ -27,6 +27,21 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
   const [bookingRef, setBookingRef] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (isOpen && selectedRoomDefault) {
+      let normalized = selectedRoomDefault.toLowerCase();
+      if (normalized.includes("executive")) normalized = "executive";
+      else if (normalized.includes("deluxe")) normalized = "deluxe";
+      else if (normalized.includes("royal") || normalized.includes("suite")) normalized = "royal";
+      else if (normalized.includes("dormitory") || normalized.includes("group")) normalized = "dormitory";
+
+      setFormData((prev) => ({
+        ...prev,
+        roomType: normalized,
+      }));
+    }
+  }, [isOpen, selectedRoomDefault]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

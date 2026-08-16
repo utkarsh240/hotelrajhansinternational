@@ -203,7 +203,7 @@ export default function Home() {
             <a href="#rooms" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Suites</a>
             <a href="#services" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Services</a>
             <Link href="/gallery" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Gallery</Link>
-            <a href="#attractions" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</a>
+            <Link href="/attraction" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</Link>
             <a href="#testimonials" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Reviews</a>
             <a href="#faq" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">FAQ</a>
             <a href="#contact" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Contact</a>
@@ -251,7 +251,7 @@ export default function Home() {
                 { label: "Rooms", href: "#rooms" },
                 { label: "Services", href: "#services" },
                 { label: "Gallery", href: "/gallery" },
-                { label: "Attractions", href: "#attractions" },
+                { label: "Attractions", href: "/attraction" },
                 { label: "Reviews", href: "#testimonials" },
                 { label: "FAQ", href: "#faq" },
                 { label: "Contact", href: "#contact" }
@@ -824,7 +824,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 9. Image Gallery Preview Section */}
+      {/* 9. Image Gallery Preview Section (Commented out in favor of dedicated /gallery page) */}
+      {/*
       <section id="gallery" className="py-24 bg-cream-soft/60 border-t border-b border-gold-400/10">
         <div className="max-w-7xl mx-auto px-6 md:px-12 text-center space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -850,6 +851,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      */}
 
       {/* 10. Testimonials Section */}
       <section id="testimonials" className="py-24 bg-cream relative overflow-hidden">
@@ -969,8 +971,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Discover Bhagalpur & Nearby Tourist Attractions */}
-      <AttractionsSection />
+      {/* Discover Bhagalpur & Nearby Tourist Attractions (Moved to dedicated /attraction page) */}
+      {/* <AttractionsSection /> */}
 
       {/* 12. Contact & Map Section */}
       <section id="contact" className="py-24 bg-cream">
@@ -978,62 +980,55 @@ export default function Home() {
           {/* Contact Details */}
           <div className="lg:col-span-5 space-y-8">
             <div className="space-y-2">
-              <span className="text-gold-400 text-xs uppercase tracking-[0.3em] font-medium block">
-                Contact
-              </span>
+              <span className="text-gold-400 text-xs uppercase tracking-[0.3em] font-medium">Contact</span>
               <h2 className="font-serif text-3xl md:text-5xl text-gold-50 font-normal tracking-wide">
                 Reach us
               </h2>
             </div>
 
-            <div className="space-y-6">
-              <div className="flex gap-4 items-start">
-                <div className="p-3 bg-gold-400/5 rounded-lg border border-gold-400/20 text-gold-400">
+            <div className="space-y-6 text-sm text-gold-200/80">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-brown-900/40 border border-gold-400/20 rounded-xl text-gold-400 shrink-0">
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs uppercase tracking-widest text-gold-200/50 mb-1 font-semibold">Address</h4>
-                  <p className="text-sm text-gold-100 font-normal leading-relaxed">
-                    {cmsSettings.address_full || "Kachari Chowk, MG Road, Bhagalpur, Bihar – 812001, India"}
+                  <h3 className="font-serif text-base text-gold-100 font-medium mb-1">Address</h3>
+                  <p className="leading-relaxed font-light text-xs sm:text-sm">
+                    {cmsSettings.address || "Kachari Chowk, MG Road, Bhagalpur, Bihar – 812001, India"}
                   </p>
                   <a
                     href="https://maps.app.goo.gl/77AAPZ7hRje8Nrmk9"
                     target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-gold-400 hover:text-gold-300 font-medium mt-1.5 transition-colors"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-gold-400 hover:text-gold-300 transition-colors mt-2 font-medium"
                   >
                     <span>View on Google Maps</span>
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 </div>
               </div>
 
-              <div className="flex gap-4 items-start">
-                <div className="p-3 bg-gold-400/5 rounded-lg border border-gold-400/20 text-gold-400">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-brown-900/40 border border-gold-400/20 rounded-xl text-gold-400 shrink-0">
                   <Phone className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs uppercase tracking-widest text-gold-200/50 mb-1 font-semibold">Phones</h4>
-                  <p className="text-sm text-gold-100 font-mono">
-                    <a href={`tel:${cmsSettings.phone_primary || "+919308189201"}`} className="hover:text-gold-300">
-                      {cmsSettings.phone_primary || "+91 93081 89201"}
-                    </a>
-                  </p>
-                  <p className="text-xs text-gold-200/60 font-mono mt-1">
-                    {cmsSettings.phone_landline || "+91 641 240 9411 / 12 / 13 / 14 / 15"}
+                  <h3 className="font-serif text-base text-gold-100 font-medium mb-1">Phone</h3>
+                  <p className="leading-relaxed font-light font-mono text-xs sm:text-sm">
+                    {cmsSettings.phone_primary || "+91 93081 89201"}
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-4 items-start">
-                <div className="p-3 bg-gold-400/5 rounded-lg border border-gold-400/20 text-gold-400">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-brown-900/40 border border-gold-400/20 rounded-xl text-gold-400 shrink-0">
                   <Mail className="h-5 w-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs uppercase tracking-widest text-gold-200/50 mb-1 font-semibold">Email</h4>
-                  <p className="text-sm text-gold-100">
-                    <a href={`mailto:${cmsSettings.email_official || "info@hotelrajhansinternational.com"}`} className="hover:text-gold-300">
-                      {cmsSettings.email_official || "info@hotelrajhansinternational.com"}
+                  <h3 className="font-serif text-base text-gold-100 font-medium mb-1">Email</h3>
+                  <p className="leading-relaxed font-light font-mono text-xs sm:text-sm">
+                    <a href={`mailto:${cmsSettings.email_primary || "info@hotelrajhansinternational.com"}`} className="hover:text-gold-300 transition-colors">
+                      {cmsSettings.email_primary || "info@hotelrajhansinternational.com"}
                     </a>
                   </p>
                 </div>
@@ -1168,17 +1163,12 @@ export default function Home() {
         href="https://wa.me/919308189201?text=Hello%20Hotel%20Rajhans%20International%2C%20I%20would%20like%20to%20inquire%20about%20room%20availability."
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 group flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1faa53] text-white px-4 py-3 rounded-full shadow-2xl shadow-emerald-950/50 hover:shadow-emerald-500/40 transition-all duration-300 transform hover:scale-105 active:scale-95 border border-emerald-400/30"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-2xl shadow-emerald-950/40 hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-110 active:scale-95 border border-emerald-400/40 cursor-pointer"
         aria-label="Chat with us on WhatsApp"
       >
-        <span className="relative flex h-3 w-3 -mr-0.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-        </span>
-        <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
-          <path d="M.5 12C.5 5.649 5.649.5 12 .5s11.5 5.149 11.5 11.5c0 2.215-.623 4.285-1.704 6.046L23 23.5l-5.696-1.488A11.442 11.442 0 0112 23.5C5.649 23.5.5 18.351.5 12zM12 2C6.477 2 2 6.477 2 12c0 2.13.666 4.103 1.8 5.727L2.6 21.4l3.784-1.18A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm5.54 13.064c-.244-.122-1.443-.712-1.666-.794-.223-.081-.385-.122-.548.122-.162.244-.63.793-.772.955-.142.163-.284.183-.528.061-.244-.122-1.031-.38-1.964-1.213-.726-.647-1.216-1.446-1.358-1.69-.142-.244-.015-.376.107-.497.11-.11.244-.284.366-.427.122-.142.163-.244.244-.406.081-.163.041-.305-.02-.427-.061-.122-.548-1.321-.752-1.808-.198-.475-.4-.41-.548-.417l-.467-.007c-.163 0-.427.061-.65.305-.224.244-.854.834-.854 2.035 0 1.201.874 2.36 .996 2.523.122.163 1.72 2.626 4.167 3.682.582.251 1.037.401 1.391.514.585.186 1.117.16 1.537.097.469-.07 1.443-.59 1.646-1.16.203-.569.203-1.057.142-1.16-.061-.102-.223-.163-.467-.285z"/>
+        <svg className="w-8 h-8 fill-current text-white" viewBox="0 0 24 24">
+          <path fillRule="evenodd" clipRule="evenodd" d="M18.403 5.633A8.919 8.919 0 0 0 12.053 3c-4.948 0-8.976 4.027-8.978 8.977 0 1.582.413 3.127 1.2 4.488L3 21l4.604-1.208a8.947 8.947 0 0 0 4.447 1.185h.004c4.947 0 8.975-4.027 8.977-8.977a8.922 8.922 0 0 0-2.629-6.367zM12.053 19.444h-.003a7.453 7.453 0 0 1-3.799-1.042l-.272-.162-2.824.741.753-2.753-.177-.282a7.457 7.457 0 0 1-1.144-4.01c.002-4.114 3.35-7.461 7.466-7.461a7.417 7.417 0 0 1 5.275 2.187 7.42 7.42 0 0 1 2.183 5.277c-.002 4.114-3.35 7.462-7.458 7.462zm4.091-5.584c-.225-.113-1.327-.655-1.533-.73-.205-.075-.354-.112-.504.112-.15.224-.58.73-.711.879-.13.15-.262.168-.486.056-.225-.113-.949-.349-1.808-1.115-.668-.596-1.119-1.332-1.25-1.557-.13-.225-.014-.347.099-.459.102-.101.225-.262.337-.393.113-.131.15-.225.225-.375.075-.15.038-.281-.019-.394-.056-.112-.504-1.216-.69-1.666-.182-.439-.367-.379-.504-.386l-.43-.008c-.15 0-.393.056-.599.281-.206.225-.786.768-.786 1.873 0 1.104.804 2.17 0.916 2.32.113.15 1.582 2.416 3.833 3.387.536.231.954.369 1.28.473.538.171 1.027.147 1.414.089.431-.065 1.327-.542 1.514-1.066.187-.524.187-.973.131-1.067-.056-.093-.206-.15-.431-.262z" />
         </svg>
-        <span className="font-sans text-xs font-semibold tracking-wide uppercase">WhatsApp</span>
       </a>
     </>
   );
