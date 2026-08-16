@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone,
@@ -201,7 +202,7 @@ export default function Home() {
             <a href="#about" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">About</a>
             <a href="#rooms" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Suites</a>
             <a href="#services" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Services</a>
-            <a href="/ranjhans/gallery" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Gallery</a>
+            <Link href="/gallery" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Gallery</Link>
             <a href="#attractions" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</a>
             <a href="#testimonials" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Reviews</a>
             <a href="#faq" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">FAQ</a>
@@ -249,7 +250,7 @@ export default function Home() {
                 { label: "About", href: "#about" },
                 { label: "Rooms", href: "#rooms" },
                 { label: "Services", href: "#services" },
-                { label: "Gallery", href: "/ranjhans/gallery" },
+                { label: "Gallery", href: "/gallery" },
                 { label: "Attractions", href: "#attractions" },
                 { label: "Reviews", href: "#testimonials" },
                 { label: "FAQ", href: "#faq" },
@@ -839,13 +840,13 @@ export default function Home() {
           <ImageGallery />
 
           <div className="pt-4 flex justify-center">
-            <a
-              href="/ranjhans/gallery"
+            <Link
+              href="/gallery"
               className="inline-flex items-center gap-3 bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-700 hover:to-gold-500 text-brown-900 font-bold uppercase tracking-widest text-xs py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               <span>Explore Full Dedicated Gallery</span>
               <ArrowRight className="h-4 w-4 text-brown-950" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -1124,7 +1125,7 @@ export default function Home() {
               <li><a href="#about" className="hover:text-gold-300 transition-colors">About</a></li>
               <li><a href="#rooms" className="hover:text-gold-300 transition-colors">Rooms</a></li>
               <li><a href="#services" className="hover:text-gold-300 transition-colors">Services</a></li>
-              <li><a href="/ranjhans/gallery" className="hover:text-gold-300 transition-colors">Gallery</a></li>
+              <li><Link href="/gallery" className="hover:text-gold-300 transition-colors">Gallery</Link></li>
               <li><a href="#attractions" className="hover:text-gold-300 transition-colors">Tourist Attractions</a></li>
               <li><a href="#faq" className="hover:text-gold-300 transition-colors">FAQ</a></li>
             </ul>

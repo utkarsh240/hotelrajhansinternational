@@ -208,7 +208,7 @@ export default function GalleryPage() {
       {/* 1. Header Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-cream/90 backdrop-blur-md border-b border-gold-400/20 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link href="/ranjhans" className="flex flex-col group">
+          <Link href="/" className="flex flex-col group">
             <span className="font-serif text-lg md:text-xl text-gold-300 tracking-[0.2em] font-medium uppercase leading-tight group-hover:text-gold-400 transition-colors">
               {cmsSettings.hotel_name ? cmsSettings.hotel_name.split(" ")[1] || "Rajhans" : "Rajhans"}
             </span>
@@ -218,12 +218,12 @@ export default function GalleryPage() {
           </Link>
 
           <div className="hidden lg:flex items-center gap-8">
-            <Link href="/ranjhans#about" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">About</Link>
-            <Link href="/ranjhans#rooms" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Suites</Link>
-            <Link href="/ranjhans#services" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Services</Link>
-            <Link href="/ranjhans/gallery" className="text-xs uppercase tracking-widest text-gold-400 font-bold border-b border-gold-400 pb-0.5">Gallery</Link>
-            <Link href="/ranjhans#attractions" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</Link>
-            <Link href="/ranjhans#contact" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Contact</Link>
+            <Link href="/#about" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">About</Link>
+            <Link href="/#rooms" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Suites</Link>
+            <Link href="/#services" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Services</Link>
+            <Link href="/gallery" className="text-xs uppercase tracking-widest text-gold-400 font-bold border-b border-gold-400 pb-0.5">Gallery</Link>
+            <Link href="/#attractions" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</Link>
+            <Link href="/#contact" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Contact</Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -264,12 +264,12 @@ export default function GalleryPage() {
           >
             <div className="flex flex-col gap-6 text-center pt-8">
               {[
-                { label: "Home", href: "/ranjhans" },
-                { label: "Suites & Tariffs", href: "/ranjhans#rooms" },
-                { label: "Services", href: "/ranjhans#services" },
-                { label: "Photo Gallery", href: "/ranjhans/gallery" },
-                { label: "Tourist Spots", href: "/ranjhans#attractions" },
-                { label: "Contact Us", href: "/ranjhans#contact" }
+                { label: "Home", href: "/" },
+                { label: "Suites & Tariffs", href: "/#rooms" },
+                { label: "Services", href: "/#services" },
+                { label: "Photo Gallery", href: "/gallery" },
+                { label: "Tourist Spots", href: "/#attractions" },
+                { label: "Contact Us", href: "/#contact" }
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -317,7 +317,7 @@ export default function GalleryPage() {
 
           <div className="pt-4 flex items-center justify-center gap-4">
             <Link
-              href="/ranjhans"
+              href="/"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-gold-200/80 hover:text-gold-400 font-mono transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
