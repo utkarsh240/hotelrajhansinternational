@@ -22,7 +22,8 @@ import {
   MapPinHouse,
   Menu,
   X,
-  ExternalLink
+  ExternalLink,
+  ArrowRight
 } from "lucide-react";
 import BookingModal from "@/components/BookingModal";
 import ImageGallery from "@/components/ImageGallery";
@@ -200,7 +201,7 @@ export default function Home() {
             <a href="#about" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">About</a>
             <a href="#rooms" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Suites</a>
             <a href="#services" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Services</a>
-            <a href="#gallery" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Gallery</a>
+            <a href="/ranjhans/gallery" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Gallery</a>
             <a href="#attractions" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</a>
             <a href="#testimonials" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Reviews</a>
             <a href="#faq" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">FAQ</a>
@@ -248,7 +249,7 @@ export default function Home() {
                 { label: "About", href: "#about" },
                 { label: "Rooms", href: "#rooms" },
                 { label: "Services", href: "#services" },
-                { label: "Gallery", href: "#gallery" },
+                { label: "Gallery", href: "/ranjhans/gallery" },
                 { label: "Attractions", href: "#attractions" },
                 { label: "Reviews", href: "#testimonials" },
                 { label: "FAQ", href: "#faq" },
@@ -822,17 +823,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 9. Image Gallery Section */}
+      {/* 9. Image Gallery Preview Section */}
       <section id="gallery" className="py-24 bg-cream-soft/60 border-t border-b border-gold-400/10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
-            <span className="text-gold-400 text-xs uppercase tracking-[0.3em] font-medium">Photos</span>
-            <h2 className="font-serif text-3xl md:text-5xl text-gold-50 font-normal tracking-wide">
-              Gallery
+        <div className="max-w-7xl mx-auto px-6 md:px-12 text-center space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-gold-400 text-xs uppercase tracking-[0.3em] font-medium">Virtual Tour</span>
+            <h2 className="font-serif text-3xl md:text-5xl text-brown-900 font-normal tracking-wide">
+              Photo Gallery
             </h2>
+            <p className="text-sm text-brown-800/80 font-light">
+              Explore our grand lobby lounge, luxury suites, Takshshila fine dining hall, beauty parlour, and ice cream parlour.
+            </p>
           </div>
 
           <ImageGallery />
+
+          <div className="pt-4 flex justify-center">
+            <a
+              href="/ranjhans/gallery"
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-700 hover:to-gold-500 text-brown-900 font-bold uppercase tracking-widest text-xs py-3.5 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+            >
+              <span>Explore Full Dedicated Gallery</span>
+              <ArrowRight className="h-4 w-4 text-brown-950" />
+            </a>
+          </div>
         </div>
       </section>
 
@@ -1110,7 +1124,7 @@ export default function Home() {
               <li><a href="#about" className="hover:text-gold-300 transition-colors">About</a></li>
               <li><a href="#rooms" className="hover:text-gold-300 transition-colors">Rooms</a></li>
               <li><a href="#services" className="hover:text-gold-300 transition-colors">Services</a></li>
-              <li><a href="#gallery" className="hover:text-gold-300 transition-colors">Gallery</a></li>
+              <li><a href="/ranjhans/gallery" className="hover:text-gold-300 transition-colors">Gallery</a></li>
               <li><a href="#attractions" className="hover:text-gold-300 transition-colors">Tourist Attractions</a></li>
               <li><a href="#faq" className="hover:text-gold-300 transition-colors">FAQ</a></li>
             </ul>
