@@ -21,10 +21,14 @@ import {
   Utensils,
   MapPinHouse,
   Menu,
-  X
+  X,
+  ExternalLink
 } from "lucide-react";
 import BookingModal from "@/components/BookingModal";
 import ImageGallery from "@/components/ImageGallery";
+import LocationSection from "@/components/LocationSection";
+import AttractionsSection from "@/components/AttractionsSection";
+
 // Hero Slideshow images (reception, suite, restaurant)
 const heroSlides = [
   {
@@ -55,9 +59,52 @@ export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Dynamic DB Data state with fallbacks
+  const [roomRates, setRoomRates] = useState<Record<string, { single: number; double: number }>>({
+    executive: { single: 3090, double: 3790 },
+    deluxe: { single: 3790, double: 4490 },
+    royal: { single: 5190, double: 5190 },
+  });
+
+  const [cmsSettings, setCmsSettings] = useState<Record<string, string>>({});
+
   // Quick contact form states
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
   const [contactSuccess, setContactSuccess] = useState(false);
+
+  // Dynamic Data fetch from DB APIs with no-store cache control & focus auto-sync
+  useEffect(() => {
+    const loadDynamicData = () => {
+      fetch("/ranjhans/api/rooms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+        .then((res) => res.json())
+        .then((d) => {
+          if (d.success && d.rooms) {
+            const rates: Record<string, { single: number; double: number }> = {};
+            d.rooms.forEach((r: any) => {
+              const key = r.type.toLowerCase().replace("royal_suite", "royal");
+              rates[key] = { single: r.basePriceSingle, double: r.basePriceDouble };
+            });
+            setRoomRates((prev) => ({ ...prev, ...rates }));
+          }
+        })
+        .catch(console.error);
+
+      fetch("/ranjhans/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+        .then((res) => res.json())
+        .then((d) => {
+          if (d.success && d.settings) {
+            setCmsSettings(d.settings);
+          }
+        })
+        .catch(console.error);
+    };
+
+    loadDynamicData();
+
+    // Re-fetch fresh data when user returns/focuses tab
+    window.addEventListener("focus", loadDynamicData);
+    return () => window.removeEventListener("focus", loadDynamicData);
+  }, []);
 
   // Hero Carousel auto-play
   useEffect(() => {
@@ -85,13 +132,22 @@ export default function Home() {
     setIsBookingOpen(true);
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setContactSuccess(true);
-    setTimeout(() => {
-      setContactForm({ name: "", email: "", message: "" });
-      setContactSuccess(false);
-    }, 3000);
+    try {
+      await fetch("/ranjhans/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contactForm),
+      });
+      setContactSuccess(true);
+      setTimeout(() => {
+        setContactForm({ name: "", email: "", message: "" });
+        setContactSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Contact error:", err);
+    }
   };
 
   const faqs = [
@@ -125,13 +181,14 @@ export default function Home() {
     <>
       {/* 1. Transparent Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 py-4 ${isNavbarScrolled ? "glass-nav shadow-lg" : "bg-gradient-to-b from-cream-soft/95 to-cream-soft/20"
-          }`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 py-4 ${
+          isNavbarScrolled ? "glass-nav shadow-lg" : "bg-gradient-to-b from-cream-soft/95 to-cream-soft/20"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
           <a href="#hero" className="flex flex-col">
             <span className="font-serif text-lg md:text-xl text-gold-300 tracking-[0.2em] font-medium uppercase leading-tight">
-              Rajhans
+              {cmsSettings.hotel_name ? cmsSettings.hotel_name.split(" ")[1] || "Rajhans" : "Rajhans"}
             </span>
             <span className="text-[8px] md:text-[9px] text-gold-200/60 tracking-[0.25em] uppercase font-sans">
               International
@@ -144,6 +201,7 @@ export default function Home() {
             <a href="#rooms" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Suites</a>
             <a href="#services" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Services</a>
             <a href="#gallery" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Gallery</a>
+            <a href="#attractions" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Attractions</a>
             <a href="#testimonials" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Reviews</a>
             <a href="#faq" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">FAQ</a>
             <a href="#contact" className="text-xs uppercase tracking-widest text-gold-100 hover:text-gold-300 transition-colors font-medium">Contact</a>
@@ -151,12 +209,12 @@ export default function Home() {
 
           <div className="flex items-center gap-4">
             <a
-              href="tel:+919308189201"
+              href={`tel:${cmsSettings.phone_primary || "+919308189201"}`}
               className="text-gold-200/80 hover:text-gold-300 p-2 border border-gold-400/10 rounded-full hover:bg-brown-900/5 transition-all text-xs flex items-center gap-2"
               aria-label="Call hotel"
             >
               <Phone className="h-4 w-4 text-gold-400" />
-              <span className="hidden sm:inline font-mono text-[10px] tracking-wider">+91 93081 89201</span>
+              <span className="hidden sm:inline font-mono text-[10px] tracking-wider">{cmsSettings.phone_primary || "+91 93081 89201"}</span>
             </a>
             <button
               onClick={() => openBooking("executive")}
@@ -191,6 +249,7 @@ export default function Home() {
                 { label: "Rooms", href: "#rooms" },
                 { label: "Services", href: "#services" },
                 { label: "Gallery", href: "#gallery" },
+                { label: "Attractions", href: "#attractions" },
                 { label: "Reviews", href: "#testimonials" },
                 { label: "FAQ", href: "#faq" },
                 { label: "Contact", href: "#contact" }
@@ -208,17 +267,17 @@ export default function Home() {
 
             <div className="flex flex-col items-center gap-4 border-t border-gold-400/10 pt-8">
               <a
-                href="tel:+919308189201"
+                href={`tel:${cmsSettings.phone_primary || "+919308189201"}`}
                 className="flex items-center gap-2 text-gold-300 hover:text-gold-200 text-sm font-mono tracking-wider"
               >
-                <Phone className="h-4 w-4" /> +91 93081 89201
+                <Phone className="h-4 w-4" /> {cmsSettings.phone_primary || "+91 93081 89201"}
               </a>
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
                   openBooking("executive");
                 }}
-                className="w-full bg-gradient-to-r from-gold-600 to-gold-400 text-brown-900 font-medium uppercase tracking-widest text-xs py-3.5 rounded-full text-center"
+                className="w-full bg-gradient-to-r from-gold-600 to-gold-400 text-brown-900 font-medium uppercase tracking-widest text-xs py-3.5 rounded-full text-center cursor-pointer"
               >
                 Book a Room
               </button>
@@ -261,14 +320,14 @@ export default function Home() {
             transition={{ duration: 0.45, delay: 0.12 }}
             className="space-y-4 max-w-3xl"
           >
-            <span className="text-gold-400 text-xs md:text-sm tracking-[0.35em] uppercase font-medium">
+            <span className="text-gold-400 text-xs md:text-sm tracking-[0.3em] uppercase font-medium">
               Bhagalpur · Est. 2018
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl text-gold-50 tracking-wide font-medium leading-tight drop-shadow-[0_1px_0_rgba(255,246,230,0.75)]">
-              {heroSlides[currentSlide].title}
+              {cmsSettings.hotel_name || heroSlides[currentSlide].title}
             </h1>
             <p className="text-gold-100/85 text-sm md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
-              {heroSlides[currentSlide].subtitle}
+              {cmsSettings.hotel_subtitle || heroSlides[currentSlide].subtitle}
             </p>
           </motion.div>
 
@@ -360,11 +419,11 @@ export default function Home() {
             </div>
 
             <p className="text-gold-200/85 text-sm md:text-base font-normal leading-relaxed">
-              Hotel Rajhans International has been run by Takshshila Regency Pvt. Ltd. since 2018. We host business travellers, families, and groups passing through Bhagalpur.
+              {cmsSettings.hotel_name || "Hotel Rajhans International"} has been run by {cmsSettings.company_name || "Takshshila Regency Pvt. Ltd."} since 2018. We host business travellers, families, and groups passing through Bhagalpur.
             </p>
 
             <p className="text-gold-200/80 text-sm leading-relaxed">
-              The property sits at Kachari Chowk on MG Road — walking distance to courts, markets, and the railway station.
+              The property sits at {cmsSettings.address_full || "Kachari Chowk, MG Road, Bhagalpur"} — walking distance to courts, markets, and the railway station.
             </p>
 
             <div className="pt-6 border-t border-gold-400/10 grid grid-cols-2 gap-6">
@@ -406,31 +465,11 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {[
-              {
-                title: "Central location",
-                description: "Kachari Chowk, MG Road.",
-                icon: MapPin,
-              },
-              {
-                title: "Clean rooms",
-                description: "Work desk, A/C, and daily housekeeping.",
-                icon: Award,
-              },
-              {
-                title: "On-site dining",
-                description: "Restaurant, parlour, saloon, and ice cream.",
-                icon: Utensils,
-              },
-              {
-                title: "Free parking",
-                description: "Private parking with round-the-clock monitoring.",
-                icon: ShieldCheck,
-              },
-              {
-                title: "Station pickup",
-                description: "Drop and pickup arranged on request.",
-                icon: Compass,
-              },
+              { title: "Central location", description: "Kachari Chowk, MG Road.", icon: MapPin },
+              { title: "Clean rooms", description: "Work desk, A/C, and daily housekeeping.", icon: Award },
+              { title: "On-site dining", description: "Restaurant, parlour, saloon, and ice cream.", icon: Utensils },
+              { title: "Free parking", description: "Private parking with round-the-clock monitoring.", icon: ShieldCheck },
+              { title: "Station pickup", description: "Drop and pickup arranged on request.", icon: Compass },
             ].map((item, idx) => (
               <div
                 key={idx}
@@ -489,8 +528,12 @@ export default function Home() {
                       Executive Room
                     </h3>
                     <div className="text-right">
-                      <p className="text-gold-300 font-sans text-lg font-semibold">₹3,090 <span className="text-[10px] text-gold-200/50 font-sans font-normal">/ Single</span></p>
-                      <p className="text-gold-200/60 font-sans text-xs">₹3,790 <span className="text-[9px] text-gold-200/40 font-sans font-normal">/ Double</span></p>
+                      <p className="text-gold-300 font-sans text-lg font-semibold">
+                        ₹{roomRates.executive.single.toLocaleString()} <span className="text-[10px] text-gold-200/50 font-sans font-normal">/ Single</span>
+                      </p>
+                      <p className="text-gold-200/60 font-sans text-xs">
+                        ₹{roomRates.executive.double.toLocaleString()} <span className="text-[9px] text-gold-200/40 font-sans font-normal">/ Double</span>
+                      </p>
                     </div>
                   </div>
 
@@ -541,8 +584,12 @@ export default function Home() {
                       Deluxe Room
                     </h3>
                     <div className="text-right">
-                      <p className="text-gold-300 font-sans text-lg font-semibold">₹3,790 <span className="text-[10px] text-gold-200/50 font-sans font-normal">/ Single</span></p>
-                      <p className="text-gold-200/60 font-sans text-xs">₹4,490 <span className="text-[9px] text-gold-200/40 font-sans font-normal">/ Double</span></p>
+                      <p className="text-gold-300 font-sans text-lg font-semibold">
+                        ₹{roomRates.deluxe.single.toLocaleString()} <span className="text-[10px] text-gold-200/50 font-sans font-normal">/ Single</span>
+                      </p>
+                      <p className="text-gold-200/60 font-sans text-xs">
+                        ₹{roomRates.deluxe.double.toLocaleString()} <span className="text-[9px] text-gold-200/40 font-sans font-normal">/ Double</span>
+                      </p>
                     </div>
                   </div>
 
@@ -593,7 +640,9 @@ export default function Home() {
                       Royal Suite
                     </h3>
                     <div className="text-right">
-                      <p className="text-gold-300 font-sans text-xl font-semibold">₹5,190 <span className="text-[10px] text-gold-200/50 font-sans font-normal">/ Suite</span></p>
+                      <p className="text-gold-300 font-sans text-xl font-semibold">
+                        ₹{roomRates.royal.single.toLocaleString()} <span className="text-[10px] text-gold-200/50 font-sans font-normal">/ Suite</span>
+                      </p>
                     </div>
                   </div>
 
@@ -638,14 +687,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {[
-              "Air conditioning",
-              "WiFi",
-              "TV",
-              "Wardrobe",
-              "Work desk",
-              "Room service",
-            ].map((amenity) => (
+            {["Air conditioning", "WiFi", "TV", "Wardrobe", "Work desk", "Room service"].map((amenity) => (
               <div
                 key={amenity}
                 className="flex items-center gap-3 px-4 py-3.5 rounded-lg border border-gold-400/15 bg-cream/70 min-h-[56px]"
@@ -912,6 +954,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Discover Bhagalpur & Nearby Tourist Attractions */}
+      <AttractionsSection />
+
       {/* 12. Contact & Map Section */}
       <section id="contact" className="py-24 bg-cream">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -934,9 +979,17 @@ export default function Home() {
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-gold-200/50 mb-1 font-semibold">Address</h4>
                   <p className="text-sm text-gold-100 font-normal leading-relaxed">
-                    Kachari Chowk, MG Road,<br />
-                    Bhagalpur, Bihar – 812001, India
+                    {cmsSettings.address_full || "Kachari Chowk, MG Road, Bhagalpur, Bihar – 812001, India"}
                   </p>
+                  <a
+                    href="https://maps.app.goo.gl/77AAPZ7hRje8Nrmk9"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-gold-400 hover:text-gold-300 font-medium mt-1.5 transition-colors"
+                  >
+                    <span>View on Google Maps</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
                 </div>
               </div>
 
@@ -947,10 +1000,12 @@ export default function Home() {
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-gold-200/50 mb-1 font-semibold">Phones</h4>
                   <p className="text-sm text-gold-100 font-mono">
-                    <a href="tel:+919308189201" className="hover:text-gold-300">+91 93081 89201</a>
+                    <a href={`tel:${cmsSettings.phone_primary || "+919308189201"}`} className="hover:text-gold-300">
+                      {cmsSettings.phone_primary || "+91 93081 89201"}
+                    </a>
                   </p>
                   <p className="text-xs text-gold-200/60 font-mono mt-1">
-                    +91 641 240 9411 / 12 / 13 / 14 / 15
+                    {cmsSettings.phone_landline || "+91 641 240 9411 / 12 / 13 / 14 / 15"}
                   </p>
                 </div>
               </div>
@@ -962,8 +1017,8 @@ export default function Home() {
                 <div>
                   <h4 className="text-xs uppercase tracking-widest text-gold-200/50 mb-1 font-semibold">Email</h4>
                   <p className="text-sm text-gold-100">
-                    <a href="mailto:info@hotelrajhansinternational.com" className="hover:text-gold-300">
-                      info@hotelrajhansinternational.com
+                    <a href={`mailto:${cmsSettings.email_official || "info@hotelrajhansinternational.com"}`} className="hover:text-gold-300">
+                      {cmsSettings.email_official || "info@hotelrajhansinternational.com"}
                     </a>
                   </p>
                 </div>
@@ -1018,19 +1073,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Interactive Map Embed */}
-          <div className="lg:col-span-7 h-[450px] lg:h-auto min-h-[350px] relative rounded-lg overflow-hidden border border-gold-400/10 shadow-lg">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3608.113031023773!2d87.0052345!3d25.2499692!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f04be66a0df017%3A0xe9f79b6999a9a38!2sHotel%20Rajhans%20International!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-              width="100%"
-              height="100%"
-              style={{ border: 0, filter: "grayscale(35%) contrast(95%) saturate(85%)" }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Hotel Rajhans International Google Map"
-              id="google-maps-iframe"
-            />
+          {/* Location & Map Section */}
+          <div className="lg:col-span-7">
+            <LocationSection />
           </div>
         </div>
       </section>
@@ -1041,10 +1086,10 @@ export default function Home() {
           {/* Logo & Certifications */}
           <div className="space-y-4 col-span-1 md:col-span-2">
             <h3 className="font-serif text-lg text-gold-300 font-medium uppercase tracking-[0.2em] leading-none">
-              Hotel Rajhans International
+              {cmsSettings.hotel_name || "Hotel Rajhans International"}
             </h3>
             <p className="text-gold-200/50 max-w-sm text-xs leading-relaxed font-normal">
-              A unit of <span className="text-gold-100 font-medium">Takshshila Regency Pvt. Ltd.</span> · Kachari Chowk, MG Road, Bhagalpur.
+              A unit of <span className="text-gold-100 font-medium">{cmsSettings.company_name || "Takshshila Regency Pvt. Ltd."}</span> · {cmsSettings.address_full || "Kachari Chowk, MG Road, Bhagalpur"}.
             </p>
             <div className="flex gap-4 pt-2">
               <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gold-300 font-semibold font-mono border border-gold-400/10 bg-brown-900/5 py-1 px-3 rounded">
@@ -1066,6 +1111,7 @@ export default function Home() {
               <li><a href="#rooms" className="hover:text-gold-300 transition-colors">Rooms</a></li>
               <li><a href="#services" className="hover:text-gold-300 transition-colors">Services</a></li>
               <li><a href="#gallery" className="hover:text-gold-300 transition-colors">Gallery</a></li>
+              <li><a href="#attractions" className="hover:text-gold-300 transition-colors">Tourist Attractions</a></li>
               <li><a href="#faq" className="hover:text-gold-300 transition-colors">FAQ</a></li>
             </ul>
           </div>
@@ -1076,12 +1122,12 @@ export default function Home() {
               Address & Contact
             </h4>
             <p className="text-xs leading-relaxed font-normal">
-              Kachari Chowk, MG Road,<br />
-              Bhagalpur, Bihar 812001
+              {cmsSettings.address_full || "Kachari Chowk, MG Road, Bhagalpur, Bihar 812001"}
             </p>
             <p className="font-mono text-xs">
-              P: +91 93081 89201<br />
-              E: <a href="mailto:info@hotelrajhansinternational.com" className="hover:text-gold-300">info@hotelrajhansinternational.com</a>
+              P: {cmsSettings.phone_primary || "+91 93081 89201"}<br />
+              WA: <a href="https://wa.me/919308189201?text=Hello%20Hotel%20Rajhans%20International" target="_blank" rel="noopener noreferrer" className="hover:text-gold-300 text-emerald-400">+91 93081 89201</a><br />
+              E: <a href={`mailto:${cmsSettings.email_official || "info@hotelrajhansinternational.com"}`} className="hover:text-gold-300">{cmsSettings.email_official || "info@hotelrajhansinternational.com"}</a>
             </p>
           </div>
         </div>
@@ -1090,7 +1136,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-gold-400/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gold-200/30 uppercase tracking-widest">
           <p>© {new Date().getFullYear()} Hotel Rajhans International. All Rights Reserved.</p>
           <p className="flex items-center gap-1.5">
-            <MapPinHouse className="h-3 w-3 text-gold-400/50" /> A Unit of Takshshila Regency Pvt. Ltd.
+            <MapPinHouse className="h-3 w-3 text-gold-400/50" /> A Unit of {cmsSettings.company_name || "Takshshila Regency Pvt. Ltd."}
           </p>
         </div>
       </footer>
@@ -1101,6 +1147,24 @@ export default function Home() {
         onClose={() => setIsBookingOpen(false)}
         selectedRoomDefault={selectedRoomCategory}
       />
+
+      {/* Floating WhatsApp Action Button */}
+      <a
+        href="https://wa.me/919308189201?text=Hello%20Hotel%20Rajhans%20International%2C%20I%20would%20like%20to%20inquire%20about%20room%20availability."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 group flex items-center gap-2.5 bg-[#25D366] hover:bg-[#1faa53] text-white px-4 py-3 rounded-full shadow-2xl shadow-emerald-950/50 hover:shadow-emerald-500/40 transition-all duration-300 transform hover:scale-105 active:scale-95 border border-emerald-400/30"
+        aria-label="Chat with us on WhatsApp"
+      >
+        <span className="relative flex h-3 w-3 -mr-0.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+        </span>
+        <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
+          <path d="M.5 12C.5 5.649 5.649.5 12 .5s11.5 5.149 11.5 11.5c0 2.215-.623 4.285-1.704 6.046L23 23.5l-5.696-1.488A11.442 11.442 0 0112 23.5C5.649 23.5.5 18.351.5 12zM12 2C6.477 2 2 6.477 2 12c0 2.13.666 4.103 1.8 5.727L2.6 21.4l3.784-1.18A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm5.54 13.064c-.244-.122-1.443-.712-1.666-.794-.223-.081-.385-.122-.548.122-.162.244-.63.793-.772.955-.142.163-.284.183-.528.061-.244-.122-1.031-.38-1.964-1.213-.726-.647-1.216-1.446-1.358-1.69-.142-.244-.015-.376.107-.497.11-.11.244-.284.366-.427.122-.142.163-.244.244-.406.081-.163.041-.305-.02-.427-.061-.122-.548-1.321-.752-1.808-.198-.475-.4-.41-.548-.417l-.467-.007c-.163 0-.427.061-.65.305-.224.244-.854.834-.854 2.035 0 1.201.874 2.36 .996 2.523.122.163 1.72 2.626 4.167 3.682.582.251 1.037.401 1.391.514.585.186 1.117.16 1.537.097.469-.07 1.443-.59 1.646-1.16.203-.569.203-1.057.142-1.16-.061-.102-.223-.163-.467-.285z"/>
+        </svg>
+        <span className="font-sans text-xs font-semibold tracking-wide uppercase">WhatsApp</span>
+      </a>
     </>
   );
 }

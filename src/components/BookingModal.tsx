@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Users, Home, User, Phone, Mail, Award, CheckCircle } from "lucide-react";
+import { X, Calendar, Users, Home, User, Phone, Mail, Award, CheckCircle, CreditCard, FileText } from "lucide-react";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -25,29 +25,112 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [bookingRef, setBookingRef] = useState("");
+  const [bookingId, setBookingId] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const loadCashfreeSdk = (): Promise<any> => {
+    return new Promise((resolve) => {
+      if ((window as any).Cashfree) {
+        return resolve((window as any).Cashfree);
+      }
+      const script = document.createElement("script");
+      script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+      script.onload = () => {
+        resolve((window as any).Cashfree);
+      };
+      script.onerror = () => resolve(null);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage("");
 
-    setTimeout(() => {
+    try {
+      // 1. Availability check & create booking (PENDING)
+      const res = await fetch("/ranjhans/api/bookings", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Selected room is not available for these dates.");
+      }
+
+      // 2. Create Cashfree payment order
+      const cfRes = await fetch("/ranjhans/api/payments/cashfree/create-order", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
+        body: JSON.stringify({ bookingId: data.booking.id }),
+      });
+
+      const cfData = await cfRes.json();
+
+      if (!cfRes.ok || !cfData.success) {
+        throw new Error(cfData.error || "Failed to initialize payment gateway.");
+      }
+
+      // 3. Trigger Cashfree Web SDK Checkout Popup
+      const CashfreeSdk = await loadCashfreeSdk();
+      if (CashfreeSdk && cfData.paymentSessionId) {
+        try {
+          const cashfree = CashfreeSdk({
+            mode: cfData.environment === "PRODUCTION" ? "production" : "sandbox",
+          });
+
+          await cashfree.checkout({
+            paymentSessionId: cfData.paymentSessionId,
+            redirectTarget: "_modal",
+          });
+        } catch (checkoutErr) {
+          console.warn("Cashfree Modal Checkout Notice:", checkoutErr);
+        }
+      }
+
+      // 4. Server-Side Payment Verification (Required)
+      const verifyRes = await fetch("/ranjhans/api/payments/cashfree/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: data.booking.id,
+          orderId: cfData.orderId,
+        }),
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (verifyData.success) {
+        setBookingRef(verifyData.bookingReference);
+        setBookingId(data.booking.id);
+        setIsSubmitted(true);
+      } else {
+        throw new Error(verifyData.error || "Payment verification failed.");
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "Failed to complete reservation. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      setBookingRef("HRJ-" + Math.floor(100000 + Math.random() * 900000));
-    }, 350);
+    }
   };
 
   const handleClose = () => {
     onClose();
-    // Reset state after transition completes
     setTimeout(() => {
       setIsSubmitted(false);
       setIsSubmitting(false);
+      setErrorMessage("");
     }, 300);
   };
 
@@ -72,12 +155,12 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
             transition={{ type: "spring", duration: 0.5 }}
             className="relative z-10 w-full max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto overflow-x-hidden rounded-lg border border-gold-400/20 bg-cream-soft shadow-2xl"
           >
-            {/* Elegant Top Gold Accent Line */}
+            {/* Top Gold Accent Line */}
             <div className="h-1.5 w-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600" />
 
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 p-2 text-gold-200/60 hover:text-gold-300 transition-colors rounded-full hover:bg-brown-900/5"
+              className="absolute top-4 right-4 p-2 text-gold-200/60 hover:text-gold-300 transition-colors rounded-full hover:bg-brown-900/5 cursor-pointer"
               aria-label="Close modal"
             >
               <X className="h-5 w-5" />
@@ -86,13 +169,19 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
             {!isSubmitted ? (
               <div className="p-6 md:p-8">
                 <div className="mb-6 text-center">
-                  <h3 className="font-serif text-2xl md:text-3xl text-gold-300 tracking-wide">
+                  <h3 className="font-serif text-2xl md:text-3xl text-gold-300 tracking-wide font-medium">
                     Book a room
                   </h3>
                   <p className="text-gold-200/60 text-xs tracking-widest uppercase mt-1">
-                    We&apos;ll confirm by phone or email
+                    Live Room Availability & Instant Confirmation
                   </p>
                 </div>
+
+                {errorMessage && (
+                  <div className="mb-4 p-3 bg-red-900/10 border border-red-500/30 rounded-lg text-red-700 text-xs text-center font-medium">
+                    {errorMessage}
+                  </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Reservation Dates */}
@@ -157,7 +246,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                         <option value="2">2 Guests</option>
                         <option value="3">3 Guests</option>
                         <option value="4">4 Guests</option>
-                        <option value="5+">5+ Guests (Group)</option>
+                        <option value="5">5+ Guests (Group)</option>
                       </select>
                     </div>
                   </div>
@@ -198,13 +287,12 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                       </div>
                       <div>
                         <label className="block text-xs font-medium uppercase tracking-widest text-gold-200/80 mb-1.5 flex items-center gap-1.5">
-                          <Mail className="h-3.5 w-3.5 text-gold-400" /> Email Address
+                          <Mail className="h-3.5 w-3.5 text-gold-400" /> Email address
                         </label>
                         <input
                           type="email"
                           name="email"
-                          placeholder="you@email.com"
-                          required
+                          placeholder="name@example.com"
                           value={formData.email}
                           onChange={handleChange}
                           className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm"
@@ -214,12 +302,12 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
 
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-widest text-gold-200/80 mb-1.5">
-                        Special requests
+                        Special Requests (Optional)
                       </label>
                       <textarea
                         name="specialRequests"
                         rows={2}
-                        placeholder="Early check-in, extra bed, station pickup..."
+                        placeholder="Arrival time, extra bed request, etc."
                         value={formData.specialRequests}
                         onChange={handleChange}
                         className="w-full bg-paper border border-gold-400/20 rounded-lg py-2.5 px-3 text-gold-100 placeholder-gold-200/20 focus:outline-none focus:border-gold-400/50 transition-colors text-sm resize-none"
@@ -231,99 +319,55 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 hover:from-gold-700 hover:via-gold-500 hover:to-gold-700 text-brown-900 font-medium uppercase tracking-widest text-xs py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg shadow-gold-400/10 active:scale-[0.98] disabled:opacity-70 flex justify-center items-center gap-2 cursor-pointer"
+                      className="w-full bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-700 hover:to-gold-500 text-brown-900 font-semibold uppercase tracking-widest text-xs py-3.5 px-6 rounded-lg transition-all duration-300 shadow-md shadow-gold-400/10 cursor-pointer flex items-center justify-center gap-2"
                     >
                       {isSubmitting ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-brown-900" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          Submitting...
-                        </>
+                        <span>Verifying Availability & Booking...</span>
                       ) : (
-                        "Submit booking request"
+                        <>
+                          <CreditCard className="h-4 w-4" /> Confirm & Pay via Cashfree
+                        </>
                       )}
                     </button>
                   </div>
                 </form>
               </div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-8 text-center"
-              >
-                <div className="flex justify-center mb-6">
-                  <div className="relative">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring" }}
-                      className="bg-gold-400/10 p-4 rounded-full border border-gold-400/30"
-                    >
-                      <CheckCircle className="h-12 w-12 text-gold-400" />
-                    </motion.div>
-                    <div className="absolute -inset-1 rounded-full bg-gold-400/20 blur-sm animate-pulse" />
-                  </div>
+              <div className="p-8 text-center space-y-6">
+                <div className="mx-auto w-16 h-16 bg-gold-400/10 rounded-full flex items-center justify-center border border-gold-400/30 text-gold-400">
+                  <CheckCircle className="h-8 w-8" />
                 </div>
 
-                <h3 className="font-serif text-3xl text-gold-300 tracking-wide mb-3">
-                  Request received
-                </h3>
-                <p className="text-gold-200/80 max-w-md mx-auto text-sm leading-relaxed mb-6">
-                  Thanks, <span className="text-gold-100 font-semibold">{formData.name}</span>. We&apos;ve noted your request for the{" "}
-                  <span className="text-gold-100 font-semibold">
-                    {formData.roomType === "royal"
-                      ? "Royal Suite"
-                      : formData.roomType === "deluxe"
-                      ? "Deluxe Room"
-                      : formData.roomType === "dormitory"
-                      ? "Dormitory"
-                      : "Executive Room"}
-                  </span>.
-                </p>
-
-                <div className="bg-paper border border-gold-400/20 rounded-lg p-5 max-w-sm mx-auto mb-8 text-left space-y-2">
-                  <div className="flex justify-between text-xs text-gold-200/60 uppercase tracking-wider">
-                    <span>Reference ID:</span>
-                    <span className="text-gold-400 font-mono font-semibold">{bookingRef}</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-gold-200/60 uppercase tracking-wider">
-                    <span>Dates:</span>
-                    <span className="text-gold-100 font-medium">{formData.checkIn} to {formData.checkOut}</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-gold-200/60 uppercase tracking-wider">
-                    <span>Guests:</span>
-                    <span className="text-gold-100 font-medium">{formData.guests} Guest(s)</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 max-w-md mx-auto">
-                  <p className="text-xs text-gold-200/50 leading-relaxed">
-                    Our team will call <span className="text-gold-300">{formData.phone}</span> or email{" "}
-                    <span className="text-gold-300">{formData.email}</span> to confirm availability and rates.
+                <div className="space-y-2">
+                  <span className="text-[10px] uppercase font-mono tracking-widest text-gold-400 font-bold">
+                    Reservation Confirmed
+                  </span>
+                  <h3 className="font-serif text-3xl text-gold-300">
+                    {bookingRef}
+                  </h3>
+                  <p className="text-gold-200/70 text-xs max-w-md mx-auto leading-relaxed">
+                    Thank you, <strong className="text-gold-100">{formData.name}</strong>. Your room reservation has been confirmed and verified. A receipt has been sent to your email.
                   </p>
-                  
-                  <div className="pt-2">
-                    <button
-                      onClick={handleClose}
-                      className="border border-gold-400/30 hover:border-gold-300 text-gold-300 hover:text-gold-200 font-medium uppercase tracking-widest text-xs py-3 px-8 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Close
-                    </button>
-                  </div>
                 </div>
-              </motion.div>
-            )}
 
-            {/* Bottom Brand Bar */}
-            <div className="bg-cream py-3 px-6 border-t border-gold-400/5 flex justify-between items-center text-[10px] text-gold-200/30 uppercase tracking-widest">
-              <span className="flex items-center gap-1">
-                <Award className="h-3 w-3 text-gold-400/50" /> Hotel Rajhans International
-              </span>
-              <span>Est. 2018</span>
-            </div>
+                <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                  <a
+                    href={`/ranjhans/api/invoice/${bookingId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 bg-paper border border-gold-400/30 text-gold-100 hover:text-gold-300 text-xs uppercase font-medium tracking-widest py-3 px-6 rounded-lg transition-colors"
+                  >
+                    <FileText className="h-4 w-4 text-gold-400" /> View Tax Invoice
+                  </a>
+                  <button
+                    onClick={handleClose}
+                    className="bg-gradient-to-r from-gold-600 to-gold-400 text-brown-900 font-semibold uppercase tracking-widest text-xs py-3 px-6 rounded-lg shadow-md cursor-pointer"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
       )}

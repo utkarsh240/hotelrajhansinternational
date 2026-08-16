@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  /* Server dynamic mode enabled for API routes, Auth middleware, and Database connection */
   images: {
     unoptimized: true,
   },
-  // Configured basePath for GitHub Pages deployment under the repository name '/ranjhans'
+  // Keep basePath if configured for subpath routing, or empty for standard domain hosting
   basePath: "/ranjhans",
 };
 
