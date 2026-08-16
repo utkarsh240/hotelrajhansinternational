@@ -11,7 +11,7 @@ export default function AdminCMSPage() {
 
   const fetchCMS = () => {
     setLoading(true);
-    fetch("/ranjhans/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch("/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setSettings(d.settings);
@@ -33,7 +33,7 @@ export default function AdminCMSPage() {
     setSaving(true);
     setSuccessMsg("");
     try {
-      const res = await fetch("/ranjhans/api/cms", {
+      const res = await fetch("/api/cms", {
         method: "PUT",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },

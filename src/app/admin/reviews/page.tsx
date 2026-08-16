@@ -9,7 +9,7 @@ export default function AdminReviewsPage() {
 
   const fetchReviews = () => {
     setLoading(true);
-    fetch("/ranjhans/api/reviews")
+    fetch("/api/reviews")
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setReviews(d.reviews);
@@ -24,7 +24,7 @@ export default function AdminReviewsPage() {
 
   const updateReviewStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch("/ranjhans/api/reviews", {
+      const res = await fetch("/api/reviews", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),

@@ -23,7 +23,7 @@ export default function AdminBookingsPage() {
     if (statusFilter !== "ALL") query.set("status", statusFilter);
     if (search) query.set("search", search);
 
-    fetch(`/ranjhans/api/bookings?${query.toString()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch(`/api/bookings?${query.toString()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setBookings(d.bookings);
@@ -44,7 +44,7 @@ export default function AdminBookingsPage() {
   const updateBookingStatus = async (id: string, newStatus: string) => {
     setUpdating(true);
     try {
-      const res = await fetch(`/ranjhans/api/bookings/${id}`, {
+      const res = await fetch(`/api/bookings/${id}`, {
         method: "PUT",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
@@ -179,7 +179,7 @@ export default function AdminBookingsPage() {
                         <Eye className="h-3.5 w-3.5" />
                       </button>
                       <a
-                        href={`/ranjhans/api/invoice/${b.id}`}
+                        href={`/api/invoice/${b.id}`}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex p-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700"
@@ -295,7 +295,7 @@ export default function AdminBookingsPage() {
 
             <div className="pt-2 flex justify-between items-center border-t border-amber-500/20 text-xs">
               <a
-                href={`/ranjhans/api/invoice/${selectedBooking.id}`}
+                href={`/api/invoice/${selectedBooking.id}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-slate-700 hover:text-slate-500 underline font-mono text-xs flex items-center gap-1 font-bold"

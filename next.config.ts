@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: "/ranjhans",
+  serverExternalPackages: ["@prisma/client", "prisma"],
   images: {
     unoptimized: true,
   },

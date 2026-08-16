@@ -30,7 +30,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (pathname === "/admin/login") return;
 
-    fetch("/ranjhans/api/auth/me")
+    fetch("/api/auth/me")
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const handleLogout = async () => {
-    await fetch("/ranjhans/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
     router.refresh();
   };
@@ -159,7 +159,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-4">
             <a
-              href="/ranjhans"
+              href="/"
               target="_blank"
               rel="noreferrer"
               className="text-xs uppercase font-bold tracking-widest border border-slate-300 text-slate-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-colors hover:bg-slate-100"

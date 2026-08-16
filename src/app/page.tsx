@@ -34,17 +34,17 @@ import AttractionsSection from "@/components/AttractionsSection";
 // Hero Slideshow images (reception, suite, restaurant)
 const heroSlides = [
   {
-    src: "/ranjhans/images/reception/Reception001.jpg",
+    src: "/images/reception/Reception001.jpg",
     title: "Hotel Rajhans International",
     subtitle: "On MG Road, Kachari Chowk — rooms, dining, and parking on-site.",
   },
   {
-    src: "/ranjhans/images/suite/SR001.jpg",
+    src: "/images/suite/SR001.jpg",
     title: "Rooms & Suites",
     subtitle: "Executive, Deluxe, and Royal Suite options for business and family stays.",
   },
   {
-    src: "/ranjhans/images/restaurant/R001.jpg",
+    src: "/images/restaurant/R001.jpg",
     title: "Takshshila Restaurant",
     subtitle: "Indian, Chinese, and continental food without leaving the hotel.",
   },
@@ -77,7 +77,7 @@ export default function Home() {
   // Dynamic Data fetch from DB APIs with no-store cache control & focus auto-sync
   useEffect(() => {
     const loadDynamicData = () => {
-      fetch("/ranjhans/api/rooms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+      fetch("/api/rooms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
         .then((res) => res.json())
         .then((d) => {
           if (d.success && d.rooms) {
@@ -91,7 +91,7 @@ export default function Home() {
         })
         .catch(console.error);
 
-      fetch("/ranjhans/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+      fetch("/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
         .then((res) => res.json())
         .then((d) => {
           if (d.success && d.settings) {
@@ -137,7 +137,7 @@ export default function Home() {
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch("/ranjhans/api/contact", {
+      await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contactForm),
@@ -514,7 +514,7 @@ export default function Home() {
             <div className="glass-card rounded-lg overflow-hidden flex flex-col border border-gold-400/10 group">
               <div className="relative h-[280px] w-full overflow-hidden">
                 <Image
-                  src="/ranjhans/images/executive/Room-001.jpg"
+                  src="/images/executive/Room-001.jpg"
                   alt="Executive Room"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -570,7 +570,7 @@ export default function Home() {
             <div className="glass-card rounded-lg overflow-hidden flex flex-col border border-gold-400/10 group">
               <div className="relative h-[280px] w-full overflow-hidden">
                 <Image
-                  src="/ranjhans/images/deluxe/Delux001.jpg"
+                  src="/images/deluxe/Delux001.jpg"
                   alt="Deluxe Room"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -626,7 +626,7 @@ export default function Home() {
             <div className="glass-card rounded-lg overflow-hidden flex flex-col border border-gold-400/15 group shadow-xl">
               <div className="relative h-[280px] w-full overflow-hidden">
                 <Image
-                  src="/ranjhans/images/suite/SR001.jpg"
+                  src="/images/suite/SR001.jpg"
                   alt="Royal Suite Room"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -717,7 +717,7 @@ export default function Home() {
             <div className="glass-card rounded-lg overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/ranjhans/images/parlour/BP001.jpg"
+                  src="/images/parlour/BP001.jpg"
                   alt="Rajhans Ladies Beauty Parlour"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -769,7 +769,7 @@ export default function Home() {
             <div className="glass-card rounded-lg overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/ranjhans/images/restaurant/R001.jpg"
+                  src="/images/restaurant/R001.jpg"
                   alt="Takshshila Restaurant"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -797,7 +797,7 @@ export default function Home() {
             <div className="glass-card rounded-lg overflow-hidden border border-gold-400/10 flex flex-col md:flex-row group">
               <div className="relative h-[280px] md:h-[350px] md:w-1/2 overflow-hidden">
                 <Image
-                  src="/ranjhans/images/ice-cream/ICP001.jpg"
+                  src="/images/ice-cream/ICP001.jpg"
                   alt="Ice Cream Parlour"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"

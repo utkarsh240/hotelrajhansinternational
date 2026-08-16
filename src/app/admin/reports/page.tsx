@@ -10,7 +10,7 @@ export default function AdminReportsPage() {
 
   const fetchReports = () => {
     setLoading(true);
-    fetch("/ranjhans/api/reports")
+    fetch("/api/reports")
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setData(d);

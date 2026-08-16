@@ -11,7 +11,7 @@ export default function AdminSettingsPage() {
 
   const fetchSettings = () => {
     setLoading(true);
-    fetch("/ranjhans/api/cms")
+    fetch("/api/cms")
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setSettings(d.settings);
@@ -33,7 +33,7 @@ export default function AdminSettingsPage() {
     setSaving(true);
     setSuccessMsg("");
     try {
-      const res = await fetch("/ranjhans/api/cms", {
+      const res = await fetch("/api/cms", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings }),

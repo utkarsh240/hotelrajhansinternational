@@ -29,7 +29,7 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = () => {
     setLoading(true);
-    fetch("/ranjhans/api/reports", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch("/api/reports", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((d) => {
         if (d.success) {
@@ -231,7 +231,7 @@ export default function AdminDashboardPage() {
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <a
-                        href={`/ranjhans/api/invoice/${b.id}`}
+                        href={`/api/invoice/${b.id}`}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600"

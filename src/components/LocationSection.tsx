@@ -23,7 +23,7 @@ export default function LocationSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/ranjhans/api/location/distance", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch("/api/location/distance", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {

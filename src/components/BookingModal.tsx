@@ -55,7 +55,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
 
     try {
       // 1. Availability check & create booking (PENDING)
-      const res = await fetch("/ranjhans/api/bookings", {
+      const res = await fetch("/api/bookings", {
         method: "POST",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
@@ -69,7 +69,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
       }
 
       // 2. Create Cashfree payment order
-      const cfRes = await fetch("/ranjhans/api/payments/cashfree/create-order", {
+      const cfRes = await fetch("/api/payments/cashfree/create-order", {
         method: "POST",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
@@ -100,7 +100,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
       }
 
       // 4. Server-Side Payment Verification (Required)
-      const verifyRes = await fetch("/ranjhans/api/payments/cashfree/verify-payment", {
+      const verifyRes = await fetch("/api/payments/cashfree/verify-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -352,7 +352,7 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
 
                 <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
                   <a
-                    href={`/ranjhans/api/invoice/${bookingId}`}
+                    href={`/api/invoice/${bookingId}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center justify-center gap-2 bg-paper border border-gold-400/30 text-gold-100 hover:text-gold-300 text-xs uppercase font-medium tracking-widest py-3 px-6 rounded-lg transition-colors"

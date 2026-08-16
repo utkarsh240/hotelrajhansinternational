@@ -27,119 +27,119 @@ interface GalleryImage {
 
 const galleryImages: GalleryImage[] = [
   {
-    src: "/ranjhans/images/reception/Reception001.jpg",
+    src: "/images/reception/Reception001.jpg",
     category: "reception",
     alt: "Hotel Lobby & Grand Reception",
     title: "Grand Lobby Lounge",
     size: "wide",
   },
   {
-    src: "/ranjhans/images/reception/Reception003.jpg",
+    src: "/images/reception/Reception003.jpg",
     category: "reception",
     alt: "Lobby Seating Area",
     title: "Lobby Seating Area",
     size: "square",
   },
   {
-    src: "/ranjhans/images/reception/Reception005.jpg",
+    src: "/images/reception/Reception005.jpg",
     category: "reception",
     alt: "Reception Desk",
     title: "24/7 Front Desk Counter",
     size: "tall",
   },
   {
-    src: "/ranjhans/images/suite/SR001.jpg",
+    src: "/images/suite/SR001.jpg",
     category: "rooms",
     alt: "Royal Suite Living Room",
     title: "Royal Suite Master Living Area",
     size: "wide",
   },
   {
-    src: "/ranjhans/images/suite/SR002.jpg",
+    src: "/images/suite/SR002.jpg",
     category: "rooms",
     alt: "Royal Suite Bedroom",
     title: "Royal Suite Luxury Bedroom",
     size: "tall",
   },
   {
-    src: "/ranjhans/images/executive/Room-001.jpg",
+    src: "/images/executive/Room-001.jpg",
     category: "rooms",
     alt: "Executive Room",
     title: "Executive Room Suite",
     size: "square",
   },
   {
-    src: "/ranjhans/images/deluxe/Delux001.jpg",
+    src: "/images/deluxe/Delux001.jpg",
     category: "rooms",
     alt: "Deluxe Room",
     title: "Deluxe Family Room",
     size: "square",
   },
   {
-    src: "/ranjhans/images/suite/SR005.jpg",
+    src: "/images/suite/SR005.jpg",
     category: "rooms",
     alt: "Royal Suite Lounge",
     title: "Royal Suite Private Lounge",
     size: "wide",
   },
   {
-    src: "/ranjhans/images/restaurant/R001.jpg",
+    src: "/images/restaurant/R001.jpg",
     category: "restaurant",
     alt: "Takshshila Restaurant Dining",
     title: "Takshshila Fine Dining Hall",
     size: "wide",
   },
   {
-    src: "/ranjhans/images/restaurant/R004.jpg",
+    src: "/images/restaurant/R004.jpg",
     category: "restaurant",
     alt: "Takshshila Restaurant Buffet",
     title: "Buffet & Private Dining Tables",
     size: "square",
   },
   {
-    src: "/ranjhans/images/restaurant/R005.jpg",
+    src: "/images/restaurant/R005.jpg",
     category: "restaurant",
     alt: "Takshshila Restaurant Interior",
     title: "Restaurant Seating & Ambience",
     size: "tall",
   },
   {
-    src: "/ranjhans/images/parlour/BP001.jpg",
+    src: "/images/parlour/BP001.jpg",
     category: "services",
     alt: "Beauty Parlour & Saloon",
     title: "In-House Beauty Parlour",
     size: "tall",
   },
   {
-    src: "/ranjhans/images/parlour/BP008.jpg",
+    src: "/images/parlour/BP008.jpg",
     category: "services",
     alt: "Beauty Parlour Styling Chairs",
     title: "Saloon & Styling Station",
     size: "square",
   },
   {
-    src: "/ranjhans/images/ice-cream/ICP001.jpg",
+    src: "/images/ice-cream/ICP001.jpg",
     category: "icecream",
     alt: "Ice Cream Parlour Counter",
     title: "Fresh Ice Cream Parlour Counter",
     size: "wide",
   },
   {
-    src: "/ranjhans/images/ice-cream/ICP004.jpg",
+    src: "/images/ice-cream/ICP004.jpg",
     category: "icecream",
     alt: "Ice Cream Display",
     title: "Sundae & Frozen Dessert Station",
     size: "square",
   },
   {
-    src: "/ranjhans/images/dormitory/DM001.jpg",
+    src: "/images/dormitory/DM001.jpg",
     category: "dormitory",
     alt: "Dormitory Hall",
     title: "Spacious Group Dormitory Hall",
     size: "wide",
   },
   {
-    src: "/ranjhans/images/dormitory/DM004.jpg",
+    src: "/images/dormitory/DM004.jpg",
     category: "dormitory",
     alt: "Dormitory Lockers & Beds",
     title: "Secure Dormitory Beds & Storage",
@@ -165,7 +165,7 @@ export default function GalleryPage() {
   const [cmsSettings, setCmsSettings] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch("/ranjhans/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch("/api/cms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((d) => {
         if (d.success && d.settings) setCmsSettings(d.settings);

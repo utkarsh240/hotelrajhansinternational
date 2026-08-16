@@ -17,7 +17,7 @@ export default function AdminRoomsPage() {
 
   const fetchRooms = () => {
     setLoading(true);
-    fetch("/ranjhans/api/rooms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch("/api/rooms", { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setRooms(d.rooms);
@@ -44,7 +44,7 @@ export default function AdminRoomsPage() {
           : [],
       };
 
-      const res = await fetch(`/ranjhans/api/rooms/${editingRoom.id}`, {
+      const res = await fetch(`/api/rooms/${editingRoom.id}`, {
         method: "PUT",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
@@ -72,7 +72,7 @@ export default function AdminRoomsPage() {
 
   const toggleStatus = async (room: any, newStatus: string) => {
     try {
-      const res = await fetch(`/ranjhans/api/rooms/${room.id}`, {
+      const res = await fetch(`/api/rooms/${room.id}`, {
         method: "PUT",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },

@@ -9,7 +9,7 @@ export default function AdminMessagesPage() {
 
   const fetchMessages = () => {
     setLoading(true);
-    fetch("/ranjhans/api/contact")
+    fetch("/api/contact")
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setMessages(d.messages);
@@ -24,7 +24,7 @@ export default function AdminMessagesPage() {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch("/ranjhans/api/contact", {
+      const res = await fetch("/api/contact", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),

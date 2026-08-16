@@ -12,7 +12,7 @@ export default function AdminCustomersPage() {
   const fetchCustomers = () => {
     setLoading(true);
     const query = search ? `?search=${search}` : "";
-    fetch(`/ranjhans/api/customers${query}`, { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
+    fetch(`/api/customers${query}`, { cache: "no-store", headers: { "Cache-Control": "no-cache" } })
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setCustomers(d.customers);
@@ -33,7 +33,7 @@ export default function AdminCustomersPage() {
   const handleSaveCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("/ranjhans/api/customers", {
+      const res = await fetch("/api/customers", {
         method: "PUT",
         cache: "no-store",
         headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },

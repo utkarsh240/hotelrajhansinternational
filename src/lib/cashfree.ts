@@ -59,7 +59,7 @@ export async function createCashfreeOrder(
       customer_phone: params.customerPhone.replace(/[^0-9]/g, "").slice(-10) || "9999999999",
     },
     order_meta: {
-      return_url: params.returnUrl || `https://hotelrajhansinternational.com/ranjhans?order_id={order_id}`,
+      return_url: params.returnUrl || `${process.env.NEXT_PUBLIC_APP_URL || "https://hotelrajhansinternational.com"}?order_id={order_id}`,
     },
     order_note: params.orderNote || `Booking ${params.orderId}`,
   };

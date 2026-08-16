@@ -28,7 +28,7 @@ const ATTRACTIONS: TouristAttraction[] = [
     highlights: "8th Century Pala Empire Buddhist Monastery & Learning Center",
     description:
       "Founded by King Dharmapala, Vikramshila was one of the two premier Buddhist universities of ancient India alongside Nalanda. Explore the magnificent central stupa, monastery cells, and archaeological museum.",
-    imageSrc: "/ranjhans/images/attractions/vikramshila.jpg",
+    imageSrc: "/images/attractions/vikramshila.jpg",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Vikramshila+Ancient+University+Ruins+Kahalgaon+Bhagalpur",
     icon: Landmark,
   },
@@ -42,7 +42,7 @@ const ATTRACTIONS: TouristAttraction[] = [
     highlights: "India's Only Protected Gangetic River Dolphin Reserve",
     description:
       "Spanning 60 km along the Ganges River, this sanctuary protects the endangered freshwater Gangetic Dolphin (Platanista gangetica), river turtles, and migratory waterfowl. Boat tours available at ghats.",
-    imageSrc: "/ranjhans/images/attractions/dolphin_sanctuary.jpg",
+    imageSrc: "/images/attractions/dolphin_sanctuary.jpg",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Vikramshila+Gangetic+Dolphin+Sanctuary+Bhagalpur",
     icon: Trees,
   },
@@ -56,7 +56,7 @@ const ATTRACTIONS: TouristAttraction[] = [
     highlights: "Mythological Samudra Manthan Site & Jain Tirthankara Shrine",
     description:
       "Celebrated in Hindu epics as the churning rod used during Samudra Manthan (ocean churning). Features a scenic ropeway cable car, the sacred Papaharini Lake, ancient stone carvings, and 12th Jain Tirthankara shrine.",
-    imageSrc: "/ranjhans/images/attractions/mandar_hill.jpg",
+    imageSrc: "/images/attractions/mandar_hill.jpg",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Mandar+Hill+Banka+Bhagalpur",
     icon: Milestone,
   },
@@ -70,7 +70,7 @@ const ATTRACTIONS: TouristAttraction[] = [
     highlights: "Historic Island Shiva Temple on the Holy Ganges",
     description:
       "Perched atop a natural rock island in the flowing Ganges river at Sultanganj. Famous worldwide as the starting point for millions of pilgrims taking Uttarvahini Gangajal to Baidyanath Dham (Deoghar).",
-    imageSrc: "/ranjhans/images/attractions/ajgaivinath_temple.jpg",
+    imageSrc: "/images/attractions/ajgaivinath_temple.jpg",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Ajgaivinath+Temple+Sultanganj+Bhagalpur",
     icon: Landmark,
   },

@@ -21,7 +21,7 @@ export default function AdminGalleryPage() {
   const fetchGallery = () => {
     setLoading(true);
     const query = activeCategory !== "all" ? `?category=${activeCategory}` : "";
-    fetch(`/ranjhans/api/gallery${query}`)
+    fetch(`/api/gallery${query}`)
       .then((res) => res.json())
       .then((d) => {
         if (d.success) setImages(d.images);
@@ -37,7 +37,7 @@ export default function AdminGalleryPage() {
   const handleAddImage = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("/ranjhans/api/gallery", {
+      const res = await fetch("/api/gallery", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -57,7 +57,7 @@ export default function AdminGalleryPage() {
   const handleDeleteImage = async (id: string) => {
     if (!confirm("Are you sure you want to delete this photo?")) return;
     try {
-      const res = await fetch(`/ranjhans/api/gallery?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/gallery?id=${id}`, { method: "DELETE" });
       if (res.ok) fetchGallery();
     } catch (err) {
       console.error("Delete photo error:", err);
@@ -166,7 +166,7 @@ export default function AdminGalleryPage() {
                 <input
                   type="text"
                   required
-                  placeholder="/ranjhans/images/reception/Reception001.jpg"
+                  placeholder="/images/reception/Reception001.jpg"
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 placeholder-amber-200/30 font-medium"

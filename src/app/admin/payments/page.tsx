@@ -9,7 +9,7 @@ export default function AdminPaymentsPage() {
 
   const fetchPayments = () => {
     setLoading(true);
-    fetch("/ranjhans/api/reports")
+    fetch("/api/reports")
       .then((res) => res.json())
       .then((d) => {
         if (d.success && d.recentBookings) {

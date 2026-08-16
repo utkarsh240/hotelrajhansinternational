@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     fs.writeFileSync(filePath, buffer);
 
-    const fileUrl = `/ranjhans/uploads/${filename}`;
+    const fileUrl = `/uploads/${filename}`;
     return NextResponse.json({ success: true, url: fileUrl });
   } catch (error) {
     console.error("Upload API Error:", error);
