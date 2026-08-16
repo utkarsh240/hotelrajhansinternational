@@ -4,7 +4,7 @@ import { verifyRazorpaySignature } from "@/lib/razorpay";
 import { sendEmailNotification } from "@/lib/mailer";
 import { generateInvoiceHTML } from "@/lib/invoice";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function POST(request: Request) {
   try {

@@ -5,7 +5,6 @@ import {
   calculateHaversineDistanceKm,
 } from "@/lib/location";
 
-export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const GOOGLE_MAPS_API_KEY =
