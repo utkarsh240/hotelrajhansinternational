@@ -502,7 +502,7 @@ export default function GalleryPage() {
                 <Award className="h-3 w-3 text-gold-400" /> ISO 9001:2015
               </span>
               <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gold-300 font-semibold font-mono border border-gold-400/10 bg-brown-900/5 py-1 px-3 rounded">
-                <Clock className="h-3 w-3 text-gold-400" /> Est. 2018
+                <Clock className="h-3 w-3 text-gold-400" /> Est. 1986
               </span>
             </div>
           </div>

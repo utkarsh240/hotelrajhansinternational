@@ -323,7 +323,7 @@ export default function Home() {
             className="space-y-4 max-w-3xl"
           >
             <span className="text-gold-400 text-xs md:text-sm tracking-[0.3em] uppercase font-medium">
-              Bhagalpur · Est. 2018
+              Bhagalpur · Est. 1986
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl text-gold-50 tracking-wide font-medium leading-tight drop-shadow-[0_1px_0_rgba(255,246,230,0.75)]">
               {cmsSettings.hotel_name || heroSlides[currentSlide].title}
@@ -413,7 +413,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto px-6 md:px-12 space-y-6">
             <div className="space-y-2">
               <span className="text-gold-400 text-xs uppercase tracking-[0.3em] font-medium block">
-                Since 2018
+                Since 1986
               </span>
               <h2 className="font-serif text-3xl md:text-5xl text-gold-50 font-normal tracking-wide">
                 About the Hotel
@@ -421,7 +421,7 @@ export default function Home() {
             </div>
 
             <p className="text-gold-200/85 text-sm md:text-base font-normal leading-relaxed">
-              {cmsSettings.hotel_name || "Hotel Rajhans International"} has been run by {cmsSettings.company_name || "Takshshila Regency Pvt. Ltd."} since 2018. We host business travellers, families, and groups passing through Bhagalpur.
+              {cmsSettings.hotel_name || "Hotel Rajhans International"} has been run by {cmsSettings.company_name || "Takshshila Regency Pvt. Ltd."} since 1986. We host business travellers, families, and groups passing through Bhagalpur.
             </p>
 
             <p className="text-gold-200/80 text-sm leading-relaxed">
@@ -437,7 +437,7 @@ export default function Home() {
                   <h4 className="text-xs uppercase tracking-widest text-gold-100 font-semibold font-sans">
                     ISO 9001:2015
                   </h4>
-                  <p className="text-[10px] text-gold-200/50">Certified since 2018</p>
+                  <p className="text-[10px] text-gold-200/50">Certified since 1986</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -1106,7 +1106,7 @@ export default function Home() {
                 <Award className="h-3 w-3 text-gold-400" /> ISO 9001:2015
               </span>
               <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gold-300 font-semibold font-mono border border-gold-400/10 bg-brown-900/5 py-1 px-3 rounded">
-                <Clock className="h-3 w-3 text-gold-400" /> Est. 2018
+                <Clock className="h-3 w-3 text-gold-400" /> Est. 1986
               </span>
             </div>
           </div>
