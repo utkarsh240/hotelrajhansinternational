@@ -104,13 +104,13 @@ const galleryImages: GalleryImage[] = [
     size: "square",
   },
   {
-    src: "/images/dormitory/DM002.jpg",
+    src: "/images/dormitory/DM005.jpg",
     category: "dormitory",
     alt: "Dormitory hall",
     size: "wide",
   },
   {
-    src: "/images/dormitory/DM007.jpg",
+    src: "/images/dormitory/DM006.jpg",
     category: "dormitory",
     alt: "Dormitory beds & lounge",
     size: "tall",

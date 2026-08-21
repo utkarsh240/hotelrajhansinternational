@@ -112,8 +112,8 @@ async function main() {
       displayOrder: 4,
       amenities: ["Individual Lockers", "Air Conditioning", "Shared Bathrooms", "WiFi"],
       images: [
-        { url: "/ranjhans/images/dormitory/DM002.jpg", alt: "Dormitory Hall", isPrimary: true },
-        { url: "/ranjhans/images/dormitory/DM007.jpg", alt: "Dormitory Beds", isPrimary: false },
+        { url: "/ranjhans/images/dormitory/DM005.jpg", alt: "Dormitory Hall", isPrimary: true },
+        { url: "/ranjhans/images/dormitory/DM006.jpg", alt: "Dormitory Beds", isPrimary: false },
       ],
     },
   ];
@@ -161,8 +161,8 @@ async function main() {
     { url: "/ranjhans/images/parlour/BP008.jpg", category: "services", alt: "Beauty parlour interior", size: "square", displayOrder: 13 },
     { url: "/ranjhans/images/ice-cream/ICP001.jpg", category: "icecream", alt: "Ice cream parlour", size: "wide", displayOrder: 14 },
     { url: "/ranjhans/images/ice-cream/ICP004.jpg", category: "icecream", alt: "Ice cream display", size: "square", displayOrder: 15 },
-    { url: "/ranjhans/images/dormitory/DM002.jpg", category: "dormitory", alt: "Dormitory hall", size: "wide", displayOrder: 16 },
-    { url: "/ranjhans/images/dormitory/DM007.jpg", category: "dormitory", alt: "Dormitory beds", size: "tall", displayOrder: 17 },
+    { url: "/ranjhans/images/dormitory/DM005.jpg", category: "dormitory", alt: "Dormitory hall", size: "wide", displayOrder: 16 },
+    { url: "/ranjhans/images/dormitory/DM006.jpg", category: "dormitory", alt: "Dormitory beds", size: "tall", displayOrder: 17 },
   ];
 
   await prisma.galleryImage.deleteMany();
