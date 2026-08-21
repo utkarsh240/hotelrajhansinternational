@@ -1142,7 +1142,7 @@ export default function Home() {
               <li><a href="#rooms" className="hover:text-gold-300 transition-colors">Rooms</a></li>
               <li><a href="#services" className="hover:text-gold-300 transition-colors">Services</a></li>
               <li><Link href="/gallery" className="hover:text-gold-300 transition-colors">Gallery</Link></li>
-              <li><a href="#attractions" className="hover:text-gold-300 transition-colors">Tourist Attractions</a></li>
+              <li><Link href="/attraction" className="hover:text-gold-300 transition-colors">Tourist Attractions</Link></li>
               <li><a href="#faq" className="hover:text-gold-300 transition-colors">FAQ</a></li>
             </ul>
           </div>
