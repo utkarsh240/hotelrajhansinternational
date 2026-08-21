@@ -108,6 +108,26 @@ export default function Home() {
     return () => window.removeEventListener("focus", loadDynamicData);
   }, []);
 
+  // Preload hero slideshow & room images in browser cache immediately on page load
+  useEffect(() => {
+    heroSlides.forEach((slide) => {
+      const img = new window.Image();
+      img.src = slide.src;
+    });
+    const keyImages = [
+      "/images/executive/Room-001.jpg",
+      "/images/deluxe/Delux001.jpg",
+      "/images/suite/SR001.jpg",
+      "/images/parlour/BP001.jpg",
+      "/images/restaurant/R001.jpg",
+      "/images/ice-cream/ICP001.jpg",
+    ];
+    keyImages.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, []);
+
   // Hero Carousel auto-play
   useEffect(() => {
     const timer = setInterval(() => {
@@ -292,7 +312,7 @@ export default function Home() {
       <section id="hero" className="relative h-screen w-full overflow-visible bg-cream flex flex-col justify-center">
         {/* Slideshow */}
         <div className="absolute inset-0 z-0 overflow-hidden">
-          <AnimatePresence mode="wait">
+          <AnimatePresence>
             <motion.div
               key={currentSlide}
               initial={{ opacity: 0, scale: 1.05 }}
@@ -306,6 +326,7 @@ export default function Home() {
                 alt={heroSlides[currentSlide].title}
                 fill
                 priority
+                loading="eager"
                 className="object-cover"
                 sizes="100vw"
               />
