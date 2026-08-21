@@ -142,9 +142,9 @@ const galleryImages: GalleryImage[] = [
     size: "wide",
   },
   {
-    src: "/images/dormitory/DM004.jpg",
+    src: "/images/dormitory/DM003.jpg",
     category: "dormitory",
-    alt: "Dormitory Lockers & Beds",
+    alt: "Dormitory Beds & Storage",
     title: "Secure Dormitory Beds & Storage",
     size: "tall",
   },

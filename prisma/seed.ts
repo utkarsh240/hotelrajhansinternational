@@ -113,7 +113,7 @@ async function main() {
       amenities: ["Individual Lockers", "Air Conditioning", "Shared Bathrooms", "WiFi"],
       images: [
         { url: "/ranjhans/images/dormitory/DM001.jpg", alt: "Dormitory Hall", isPrimary: true },
-        { url: "/ranjhans/images/dormitory/DM004.jpg", alt: "Dormitory Lockers", isPrimary: false },
+        { url: "/ranjhans/images/dormitory/DM003.jpg", alt: "Dormitory Beds", isPrimary: false },
       ],
     },
   ];
@@ -162,7 +162,7 @@ async function main() {
     { url: "/ranjhans/images/ice-cream/ICP001.jpg", category: "icecream", alt: "Ice cream parlour", size: "wide", displayOrder: 14 },
     { url: "/ranjhans/images/ice-cream/ICP004.jpg", category: "icecream", alt: "Ice cream display", size: "square", displayOrder: 15 },
     { url: "/ranjhans/images/dormitory/DM001.jpg", category: "dormitory", alt: "Dormitory hall", size: "wide", displayOrder: 16 },
-    { url: "/ranjhans/images/dormitory/DM004.jpg", category: "dormitory", alt: "Dormitory lockers", size: "tall", displayOrder: 17 },
+    { url: "/ranjhans/images/dormitory/DM003.jpg", category: "dormitory", alt: "Dormitory beds", size: "tall", displayOrder: 17 },
   ];
 
   await prisma.galleryImage.deleteMany();

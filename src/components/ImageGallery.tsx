@@ -110,9 +110,9 @@ const galleryImages: GalleryImage[] = [
     size: "wide",
   },
   {
-    src: "/images/dormitory/DM004.jpg",
+    src: "/images/dormitory/DM003.jpg",
     category: "dormitory",
-    alt: "Dormitory lockers",
+    alt: "Dormitory beds & lounge",
     size: "tall",
   },
 ];
