@@ -98,19 +98,23 @@ export default function BookingModal({ isOpen, onClose, selectedRoomDefault = "e
       }
 
       // 3. Trigger Cashfree Web SDK Checkout Popup
-      const CashfreeSdk = await loadCashfreeSdk();
-      if (CashfreeSdk && cfData.paymentSessionId) {
-        try {
-          const cashfree = CashfreeSdk({
-            mode: cfData.environment === "PRODUCTION" ? "production" : "sandbox",
-          });
+      const isMockSession = Boolean(cfData.paymentSessionId?.startsWith("session_mock_"));
 
-          await cashfree.checkout({
-            paymentSessionId: cfData.paymentSessionId,
-            redirectTarget: "_modal",
-          });
-        } catch (checkoutErr) {
-          console.warn("Cashfree Modal Checkout Notice:", checkoutErr);
+      if (!isMockSession) {
+        const CashfreeSdk = await loadCashfreeSdk();
+        if (CashfreeSdk && cfData.paymentSessionId) {
+          try {
+            const cashfree = CashfreeSdk({
+              mode: cfData.environment === "PRODUCTION" ? "production" : "sandbox",
+            });
+
+            await cashfree.checkout({
+              paymentSessionId: cfData.paymentSessionId,
+              redirectTarget: "_modal",
+            });
+          } catch (checkoutErr) {
+            console.warn("Cashfree Modal Checkout Notice:", checkoutErr);
+          }
         }
       }
 

@@ -2,7 +2,14 @@ import crypto from "crypto";
 
 const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID || "TEST10255395f190e2410a562479f6e65935201";
 const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY || "cfsk_ma_test_c96417fae7bb0e34ddf482d8c3fb9f97_4f1e56b4";
-const CASHFREE_ENV = (process.env.CASHFREE_ENV || "SANDBOX").toUpperCase();
+
+const EXPLICIT_ENV = (process.env.CASHFREE_ENV || "").toUpperCase();
+const CASHFREE_ENV = EXPLICIT_ENV === "PRODUCTION" || EXPLICIT_ENV === "SANDBOX"
+  ? EXPLICIT_ENV
+  : CASHFREE_APP_ID.startsWith("TEST")
+  ? "SANDBOX"
+  : "PRODUCTION";
+
 const CASHFREE_API_VERSION = process.env.CASHFREE_API_VERSION || "2023-08-01";
 
 const BASE_URL =
@@ -48,15 +55,24 @@ export interface CashfreePaymentAttempt {
 export async function createCashfreeOrder(
   params: CreateOrderParams
 ): Promise<CashfreeOrderResponse> {
+  // Format customer phone number to strict 10 digits
+  let cleanPhone = (params.customerPhone || "").replace(/[^0-9]/g, "");
+  if (cleanPhone.length > 10) {
+    cleanPhone = cleanPhone.slice(-10);
+  }
+  if (cleanPhone.length < 10) {
+    cleanPhone = "9999999999";
+  }
+
   const payload = {
     order_id: params.orderId,
     order_amount: Math.round(params.amount * 100) / 100,
     order_currency: params.currency || "INR",
     customer_details: {
       customer_id: params.customerId.replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 50),
-      customer_name: params.customerName,
+      customer_name: params.customerName || "Guest User",
       customer_email: params.customerEmail || "guest@hotelrajhansinternational.com",
-      customer_phone: params.customerPhone.replace(/[^0-9]/g, "").slice(-10) || "9999999999",
+      customer_phone: cleanPhone,
     },
     order_meta: {
       return_url: params.returnUrl || `${process.env.NEXT_PUBLIC_APP_URL || "https://hotelrajhansinternational.com"}?order_id={order_id}`,
@@ -80,15 +96,19 @@ export async function createCashfreeOrder(
 
     if (!res.ok) {
       console.warn("Cashfree API Order Creation Warning:", data);
-      // Fallback for sandbox/development environments when API key is unconfigured
-      return {
-        cf_order_id: `cf_mock_${Date.now()}`,
-        order_id: params.orderId,
-        payment_session_id: `session_mock_${Date.now()}`,
-        order_status: "ACTIVE",
-        order_amount: payload.order_amount,
-        order_currency: "INR",
-      };
+      const apiMsg = data.message || data.error || data.reason || "Cashfree API request failed";
+      // If using default test keys in local dev, provide mock fallback
+      if (CASHFREE_APP_ID.startsWith("TEST") && process.env.NODE_ENV !== "production") {
+        return {
+          cf_order_id: `cf_mock_${Date.now()}`,
+          order_id: params.orderId,
+          payment_session_id: `session_mock_${Date.now()}`,
+          order_status: "ACTIVE",
+          order_amount: payload.order_amount,
+          order_currency: "INR",
+        };
+      }
+      throw new Error(`Cashfree Gateway Error: ${apiMsg}`);
     }
 
     return {
@@ -99,16 +119,19 @@ export async function createCashfreeOrder(
       order_amount: data.order_amount,
       order_currency: data.order_currency,
     };
-  } catch (error) {
-    console.error("Cashfree Order Network Error:", error);
-    return {
-      cf_order_id: `cf_mock_${Date.now()}`,
-      order_id: params.orderId,
-      payment_session_id: `session_mock_${Date.now()}`,
-      order_status: "ACTIVE",
-      order_amount: payload.order_amount,
-      order_currency: "INR",
-    };
+  } catch (error: any) {
+    console.error("Cashfree Order Exception:", error);
+    if (CASHFREE_APP_ID.startsWith("TEST") && process.env.NODE_ENV !== "production") {
+      return {
+        cf_order_id: `cf_mock_${Date.now()}`,
+        order_id: params.orderId,
+        payment_session_id: `session_mock_${Date.now()}`,
+        order_status: "ACTIVE",
+        order_amount: payload.order_amount,
+        order_currency: "INR",
+      };
+    }
+    throw error;
   }
 }
 
