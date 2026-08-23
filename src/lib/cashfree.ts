@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
-const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID || "TEST10255395f190e2410a562479f6e65935201";
-const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY || "cfsk_ma_test_c96417fae7bb0e34ddf482d8c3fb9f97_4f1e56b4";
+const CASHFREE_APP_ID = process.env.CASHFREE_APP_ID || "";
+const CASHFREE_SECRET_KEY = process.env.CASHFREE_SECRET_KEY || "";
 
 const EXPLICIT_ENV = (process.env.CASHFREE_ENV || "").toUpperCase();
 const CASHFREE_ENV = EXPLICIT_ENV === "PRODUCTION" || EXPLICIT_ENV === "SANDBOX"
