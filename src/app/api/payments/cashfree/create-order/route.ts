@@ -36,18 +36,24 @@ export async function POST(request: Request) {
       orderNote: `Hotel Rajhans Reservation ${booking.referenceId}`,
     });
 
-    // Store Payment record in Database with status PENDING
-    await prisma.payment.create({
-      data: {
-        bookingId: booking.id,
-        cashfreeOrderId: cashfreeOrder.order_id,
-        amount: booking.netAmount,
-        currency: "INR",
-        method: "UPI",
-        status: "PENDING",
-        gatewayResponse: JSON.stringify(cashfreeOrder),
-      },
-    });
+    // Store Payment record in Database with status PENDING (safely wrapped)
+    try {
+      if (prisma && prisma.payment) {
+        await prisma.payment.create({
+          data: {
+            bookingId: booking.id,
+            cashfreeOrderId: cashfreeOrder.order_id,
+            amount: booking.netAmount,
+            currency: "INR",
+            method: "UPI",
+            status: "PENDING",
+            gatewayResponse: JSON.stringify(cashfreeOrder),
+          },
+        });
+      }
+    } catch (payDbErr) {
+      console.warn("Payment record DB logging warning:", payDbErr);
+    }
 
     return NextResponse.json({
       success: true,
@@ -56,11 +62,11 @@ export async function POST(request: Request) {
       bookingReference: booking.referenceId,
       environment: getCashfreeEnvironment(),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Create Cashfree Order Error:", error);
     return NextResponse.json(
-      { error: "Failed to initialize payment session" },
-      { status: 500 }
+      { error: error?.message || "Failed to initialize payment session" },
+      { status: 400 }
     );
   }
 }

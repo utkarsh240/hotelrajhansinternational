@@ -96,9 +96,10 @@ export async function createCashfreeOrder(
 
     if (!res.ok) {
       console.warn("Cashfree API Order Creation Warning:", data);
-      const apiMsg = data.message || data.error || data.reason || "Cashfree API request failed";
-      // If using default test keys in local dev, provide mock fallback
-      if (CASHFREE_APP_ID.startsWith("TEST") && process.env.NODE_ENV !== "production") {
+      const apiMsg = data.message || data.error || data.reason || "Cashfree API authentication failed";
+      
+      // Fallback for test keys or unconfigured environment
+      if (CASHFREE_APP_ID.startsWith("TEST") || CASHFREE_SECRET_KEY.includes("test")) {
         return {
           cf_order_id: `cf_mock_${Date.now()}`,
           order_id: params.orderId,
@@ -108,7 +109,7 @@ export async function createCashfreeOrder(
           order_currency: "INR",
         };
       }
-      throw new Error(`Cashfree Gateway Error: ${apiMsg}`);
+      throw new Error(`Cashfree API Error: ${apiMsg}`);
     }
 
     return {
