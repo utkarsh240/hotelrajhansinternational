@@ -101,32 +101,77 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Selected room is currently unavailable." }, { status: 400 });
     }
 
-    // 2. Check Overlapping Bookings
+    // 2. Check Overlapping Bookings & Clean Up Expired Pending Reservations
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
     const nights = calculateNights(checkInDate, checkOutDate);
+    const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+    // Auto-cancel abandoned PENDING bookings older than 30 mins
+    try {
+      await prisma.booking.updateMany({
+        where: {
+          status: "PENDING",
+          createdAt: { lt: thirtyMinsAgo },
+        },
+        data: { status: "CANCELLED" },
+      });
+    } catch (e) {
+      console.warn("Expired PENDING cleanup notice:", e);
+    }
 
     const existingBookings = await prisma.booking.findMany({
       where: {
         roomId: room.id,
         status: { in: ["CONFIRMED", "CHECKED_IN", "PENDING"] },
       },
+      include: { customer: true },
     });
 
-    const hasOverlap = existingBookings.some((b) =>
-      isDateOverlap(checkInDate, checkOutDate, b.checkIn, b.checkOut)
+    const cleanPhone = phone.trim();
+
+    // Allow user to retry/continue their own recent PENDING booking session
+    const sameCustomerPending = existingBookings.find(
+      (b) => b.status === "PENDING" && b.customer?.phone === cleanPhone
     );
 
-    if (hasOverlap) {
+    if (sameCustomerPending) {
+      return NextResponse.json({
+        success: true,
+        booking: {
+          id: sameCustomerPending.id,
+          referenceId: sameCustomerPending.referenceId,
+          customerName: name.trim(),
+          customerPhone: cleanPhone,
+          customerEmail: email ? email.trim() : sameCustomerPending.customer?.email,
+          roomName: room.name,
+          checkIn: sameCustomerPending.checkIn,
+          checkOut: sameCustomerPending.checkOut,
+          nights,
+          totalAmount: sameCustomerPending.totalAmount,
+          taxAmount: sameCustomerPending.taxAmount,
+          netAmount: sameCustomerPending.netAmount,
+          status: sameCustomerPending.status,
+        },
+      });
+    }
+
+    const hasConfirmedOverlap = existingBookings.some(
+      (b) =>
+        (b.status === "CONFIRMED" || b.status === "CHECKED_IN") &&
+        isDateOverlap(checkInDate, checkOutDate, b.checkIn, b.checkOut)
+    );
+
+    if (hasConfirmedOverlap) {
       return NextResponse.json(
-        { error: "Selected dates are no longer available for this room." },
+        { error: "Selected dates are already booked for this room. Please select different dates." },
         { status: 409 }
       );
     }
 
     // 3. Find or Create Customer
     let customer = await prisma.customer.findUnique({
-      where: { phone: phone.trim() },
+      where: { phone: cleanPhone },
     });
 
     if (!customer) {
