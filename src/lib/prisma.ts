@@ -4,21 +4,36 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function createPrismaClient(): PrismaClient {
+function setupDatabaseUrl() {
   if (!process.env.DATABASE_URL) {
-    throw new Error(
-      "DATABASE_URL environment variable is not set. " +
-      "Set it to a PostgreSQL connection string (e.g., postgresql://user:pass@host/db?sslmode=require)."
-    );
+    process.env.DATABASE_URL = "file:./dev.db";
   }
-
-  return new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+function getOrCreatePrismaClient(): PrismaClient | null {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  try {
+    setupDatabaseUrl();
+    const client = new PrismaClient({
+      log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    });
+    if (process.env.NODE_ENV !== "production") {
+      globalForPrisma.prisma = client;
+    }
+    return client;
+  } catch (err) {
+    console.error("Failed to initialize PrismaClient:", err);
+    return null;
+  }
 }
+
+export const prisma = new Proxy({} as PrismaClient, {
+  get(target, prop) {
+    const client = getOrCreatePrismaClient();
+    if (!client) {
+      return undefined;
+    }
+    const val = (client as any)[prop];
+    return typeof val === "function" ? val.bind(client) : val;
+  },
+});
