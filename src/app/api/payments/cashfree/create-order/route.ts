@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createCashfreeOrder, getCashfreeEnvironment } from "@/lib/cashfree";
+import type { Booking, Customer, Room } from "@prisma/client";
 
 export const revalidate = 0;
+
+type BookingWithDetails = Booking & {
+  customer: Customer;
+  room: Room;
+};
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Booking ID is required" }, { status: 400 });
     }
 
-    let booking: any = null;
+    let booking: BookingWithDetails | null = null;
     try {
       if (prisma && prisma.booking) {
         booking = await prisma.booking.findUnique({
@@ -23,35 +29,31 @@ export async function POST(request: Request) {
       }
     } catch (dbErr) {
       console.warn("Database lookup warning in create-order:", dbErr);
+      return NextResponse.json(
+        { success: false, error: "Unable to load booking for payment." },
+        { status: 500 }
+      );
     }
 
     if (!booking) {
-      booking = {
-        id: bookingId,
-        referenceId: `HRJ-${Date.now().toString().slice(-6)}`,
-        netAmount: 3090,
-        totalAmount: 3090,
-        customer: {
-          id: `cust_${Date.now()}`,
-          name: "Guest",
-          phone: "9999999999",
-          email: "guest@hotelrajhansinternational.com",
-        },
-      };
+      return NextResponse.json(
+        { success: false, error: "Booking not found" },
+        { status: 404 }
+      );
     }
 
     // Generate unique Cashfree order ID based on booking reference
-    const orderId = `cf_${(booking.referenceId || "HRJ").replace(/[^a-zA-Z0-9_-]/g, "_")}_${Date.now()}`;
+    const orderId = `cf_${booking.referenceId.replace(/[^a-zA-Z0-9_-]/g, "_")}_${Date.now()}`;
 
     // Create Cashfree Order
     const cashfreeOrder = await createCashfreeOrder({
       orderId,
-      amount: booking.netAmount || 3090,
+      amount: booking.netAmount,
       currency: "INR",
-      customerId: booking.customer?.id || `cust_${Date.now()}`,
-      customerName: booking.customer?.name || "Guest",
-      customerPhone: booking.customer?.phone || "9999999999",
-      customerEmail: booking.customer?.email || "guest@hotelrajhansinternational.com",
+      customerId: booking.customer.id,
+      customerName: booking.customer.name,
+      customerPhone: booking.customer.phone,
+      customerEmail: booking.customer.email || "guest@hotelrajhansinternational.com",
       orderNote: `Hotel Rajhans Reservation ${booking.referenceId}`,
     });
 
@@ -62,7 +64,7 @@ export async function POST(request: Request) {
           data: {
             bookingId: booking.id,
             cashfreeOrderId: cashfreeOrder.order_id,
-            amount: booking.netAmount || 3090,
+            amount: booking.netAmount,
             currency: "INR",
             method: "UPI",
             status: "PENDING",
@@ -81,17 +83,14 @@ export async function POST(request: Request) {
       bookingReference: booking.referenceId,
       environment: getCashfreeEnvironment(),
     });
-  } catch (error: any) {
-    console.warn("Create Cashfree Order Fallback Response:", error?.message || error);
+  } catch (error: unknown) {
+    console.error("Create Cashfree Order Error:", error);
     return NextResponse.json(
       {
-        success: true,
-        paymentSessionId: `session_mock_${Date.now()}`,
-        orderId: `cf_fallback_${Date.now()}`,
-        bookingReference: "HRJ-RSV",
-        environment: getCashfreeEnvironment(),
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to initialize payment session",
       },
-      { status: 200 }
+      { status: 400 }
     );
   }
 }

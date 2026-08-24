@@ -4,8 +4,15 @@ import { fetchCashfreeOrderPayments } from "@/lib/cashfree";
 import { sendEmailNotification } from "@/lib/mailer";
 import { generateConfirmationEmailHTML } from "@/lib/invoice";
 import { syncBookingToGoogleSheet } from "@/lib/googlesheets";
+import type { Booking, Customer, Payment, Room } from "@prisma/client";
 
 export const revalidate = 0;
+
+type BookingWithDetails = Booking & {
+  customer: Customer;
+  room: Room;
+  payments: Payment[];
+};
 
 export async function POST(request: Request) {
   try {
@@ -14,11 +21,11 @@ export async function POST(request: Request) {
     if (!bookingId || !orderId) {
       return NextResponse.json(
         { success: false, error: "Booking ID and Order ID are required" },
-        { status: 200 }
+        { status: 400 }
       );
     }
 
-    let booking: any = null;
+    let booking: BookingWithDetails | null = null;
     try {
       if (prisma && prisma.booking) {
         booking = await prisma.booking.findUnique({
@@ -30,8 +37,15 @@ export async function POST(request: Request) {
       console.warn("Booking lookup notice in verify-payment:", dbLookupErr);
     }
 
+    if (!booking) {
+      return NextResponse.json(
+        { success: false, error: "Booking not found" },
+        { status: 404 }
+      );
+    }
+
     // 1. Idempotency Check: Prevent duplicate confirmation processing
-    if (booking && booking.status === "CONFIRMED") {
+    if (booking.status === "CONFIRMED") {
       return NextResponse.json({
         success: true,
         status: "CONFIRMED",
@@ -40,17 +54,19 @@ export async function POST(request: Request) {
       });
     }
 
-    const refId = booking?.referenceId || `HRJ-${Date.now().toString().slice(-6)}`;
+    const refId = booking.referenceId;
 
     // 2. Server-side payment status verification via Cashfree API
     const { orderStatus, payments } = await fetchCashfreeOrderPayments(orderId);
-    const successfulPayment = payments.find((p) => p.payment_status === "SUCCESS");
+    const successfulPayment = payments.find(
+      (p) => p.order_id === orderId && p.payment_status === "SUCCESS"
+    );
 
-    // Consider verified if Cashfree reports PAID / SUCCESS, or if fallback order ID is supplied
+    // Confirm only when Cashfree reports the order/payment as settled.
     const isVerified =
-      orderStatus === "PAID" ||
-      Boolean(successfulPayment) ||
-      orderId.startsWith("cf_");
+      orderStatus.toUpperCase() === "PAID" ||
+      orderStatus.toUpperCase() === "SUCCESS" ||
+      Boolean(successfulPayment);
 
     if (!isVerified) {
       return NextResponse.json({
@@ -61,36 +77,53 @@ export async function POST(request: Request) {
       }, { status: 200 });
     }
 
-    const paymentId = successfulPayment?.cf_payment_id || `cf_pay_${Date.now()}`;
+    const paymentId = successfulPayment?.cf_payment_id || `cf_pay_${orderId}`;
 
-    // 3. Database Updates (Safely wrapped)
+    // 3. Database Updates
     try {
-      if (prisma && booking?.id) {
-        await prisma.$transaction([
-          prisma.payment.updateMany({
-            where: { bookingId: booking.id },
+      await prisma.$transaction(async (tx) => {
+        const paymentUpdate = await tx.payment.updateMany({
+          where: { bookingId: booking.id, cashfreeOrderId: orderId },
+          data: {
+            cashfreePaymentId: paymentId,
+            status: "SUCCESS",
+            gatewayResponse: JSON.stringify({ verified: true, orderStatus, payments }),
+          },
+        });
+
+        if (paymentUpdate.count === 0) {
+          await tx.payment.create({
             data: {
+              bookingId: booking.id,
               cashfreePaymentId: paymentId,
               cashfreeOrderId: orderId,
+              amount: booking.netAmount,
+              currency: "INR",
+              method: "UPI",
               status: "SUCCESS",
               gatewayResponse: JSON.stringify({ verified: true, orderStatus, payments }),
             },
-          }),
-          prisma.booking.update({
-            where: { id: booking.id },
-            data: {
-              status: "CONFIRMED",
-              paidAmount: booking.netAmount || 3090,
-            },
-          }),
-        ]);
-      }
+          });
+        }
+
+        await tx.booking.update({
+          where: { id: booking.id },
+          data: {
+            status: "CONFIRMED",
+            paidAmount: booking.netAmount,
+          },
+        });
+      });
     } catch (dbUpdateErr) {
-      console.warn("DB update notice during payment verification:", dbUpdateErr);
+      console.error("DB update error during payment verification:", dbUpdateErr);
+      return NextResponse.json(
+        { success: false, error: "Payment verified, but booking confirmation could not be saved." },
+        { status: 500 }
+      );
     }
 
     // 4. Send Email Confirmation (Non-blocking)
-    if (booking?.customer?.email) {
+    if (booking.customer.email) {
       try {
         const emailHtml = generateConfirmationEmailHTML({
           bookingReference: refId,
@@ -98,17 +131,17 @@ export async function POST(request: Request) {
           customerPhone: booking.customer.phone,
           customerEmail: booking.customer.email,
           customerAddress: booking.customer.address,
-          roomName: booking.room?.name || "Luxury Suite",
-          checkIn: booking.checkIn || new Date(),
-          checkOut: booking.checkOut || new Date(Date.now() + 86400000),
-          guestsCount: booking.guestsCount || 2,
+          roomName: booking.room.name,
+          checkIn: booking.checkIn,
+          checkOut: booking.checkOut,
+          guestsCount: booking.guestsCount,
           roomsCount: 1,
-          basePrice: booking.room?.basePriceDouble || 3000,
-          totalAmount: booking.totalAmount || 3000,
-          taxAmount: booking.taxAmount || 360,
-          discountAmount: booking.discountAmount || 0,
-          netAmount: booking.netAmount || 3360,
-          paidAmount: booking.netAmount || 3360,
+          basePrice: booking.room.basePriceDouble,
+          totalAmount: booking.totalAmount,
+          taxAmount: booking.taxAmount,
+          discountAmount: booking.discountAmount,
+          netAmount: booking.netAmount,
+          paidAmount: booking.netAmount,
           paymentStatus: "SUCCESS",
           paymentMethod: "UPI / Cards (Cashfree PG Verified)",
           gstin: "10AAAAA0000A1Z5",
@@ -130,25 +163,23 @@ export async function POST(request: Request) {
     }
 
     // 5. Synchronize Confirmed Booking to Google Sheets (Non-blocking)
-    if (booking?.customer) {
-      try {
-        await syncBookingToGoogleSheet({
-          bookingReference: refId,
-          bookingDate: booking.createdAt || new Date(),
-          customerName: booking.customer.name,
-          phone: booking.customer.phone,
-          email: booking.customer.email,
-          roomName: booking.room?.name || "Luxury Room",
-          checkIn: booking.checkIn || new Date(),
-          checkOut: booking.checkOut || new Date(Date.now() + 86400000),
-          guestsCount: booking.guestsCount || 2,
-          netAmount: booking.netAmount || 3360,
-          paymentStatus: "SUCCESS",
-          bookingStatus: "CONFIRMED",
-        });
-      } catch (sheetErr) {
-        console.error("Non-blocking Google Sheets sync error:", sheetErr);
-      }
+    try {
+      await syncBookingToGoogleSheet({
+        bookingReference: refId,
+        bookingDate: booking.createdAt,
+        customerName: booking.customer.name,
+        phone: booking.customer.phone,
+        email: booking.customer.email,
+        roomName: booking.room.name,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        guestsCount: booking.guestsCount,
+        netAmount: booking.netAmount,
+        paymentStatus: "SUCCESS",
+        bookingStatus: "CONFIRMED",
+      });
+    } catch (sheetErr) {
+      console.error("Non-blocking Google Sheets sync error:", sheetErr);
     }
 
     return NextResponse.json({
@@ -156,12 +187,14 @@ export async function POST(request: Request) {
       status: "CONFIRMED",
       bookingReference: refId,
     }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Verify Cashfree Payment Exception:", error);
-    return NextResponse.json({
-      success: true,
-      status: "CONFIRMED",
-      bookingReference: "HRJ-CONFIRMED",
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to verify payment",
+      },
+      { status: 500 }
+    );
   }
 }
