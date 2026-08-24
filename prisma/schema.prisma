@@ -175,9 +175,6 @@ model Booking {
 model Payment {
   id                String        @id @default(uuid())
   bookingId         String
-  razorpayOrderId   String?
-  razorpayPaymentId String?
-  razorpaySignature String?
   cashfreeOrderId   String?
   cashfreePaymentId String?
   amount            Float

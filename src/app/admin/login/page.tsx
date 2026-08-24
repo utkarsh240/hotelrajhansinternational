@@ -6,8 +6,8 @@ import { Lock, Mail, Hotel, ArrowRight, ShieldCheck } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@hotelrajhansinternational.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -139,4 +139,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

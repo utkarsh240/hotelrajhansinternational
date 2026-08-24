@@ -1,6 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import fs from "fs";
-import path from "path";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -8,23 +6,10 @@ const globalForPrisma = globalThis as unknown as {
 
 function setupDatabaseUrl() {
   if (!process.env.DATABASE_URL) {
-    process.env.DATABASE_URL = "file:./dev.db";
-  }
-
-  if (process.env.VERCEL || process.env.NODE_ENV === "production") {
-    const tmpDbPath = "/tmp/dev.db";
-    const srcDbPath = path.join(process.cwd(), "prisma", "dev.db");
-
-    try {
-      if (!fs.existsSync(tmpDbPath) && fs.existsSync(srcDbPath)) {
-        fs.copyFileSync(srcDbPath, tmpDbPath);
-      }
-      if (fs.existsSync(tmpDbPath)) {
-        process.env.DATABASE_URL = `file:${tmpDbPath}`;
-      }
-    } catch (e) {
-      console.warn("Could not setup /tmp database:", e);
+    if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
+      throw new Error("DATABASE_URL is required in production.");
     }
+    process.env.DATABASE_URL = "file:./dev.db";
   }
 }
 
@@ -55,5 +40,4 @@ export const prisma = new Proxy({} as PrismaClient, {
     return typeof val === "function" ? val.bind(client) : val;
   },
 });
-
 

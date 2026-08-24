@@ -38,7 +38,7 @@ export default function AdminPaymentsPage() {
             Payment Audit Transactions
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
-            Real-time Razorpay payment logs, transaction verification, and gateway responses.
+            Real-time Cashfree payment logs, transaction verification, and gateway responses.
           </p>
         </div>
         <button
@@ -54,7 +54,7 @@ export default function AdminPaymentsPage() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-amber-500/20 text-slate-700 uppercase tracking-widest text-[10px] font-bold">
-                <th className="py-3.5 px-4">Razorpay Payment ID</th>
+                <th className="py-3.5 px-4">Cashfree Payment ID</th>
                 <th className="py-3.5 px-4">Booking Ref</th>
                 <th className="py-3.5 px-4">Guest Name</th>
                 <th className="py-3.5 px-4">Method</th>
@@ -74,9 +74,9 @@ export default function AdminPaymentsPage() {
               ) : payments.length > 0 ? (
                 payments.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-100 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-slate-700 font-bold">{p.razorpayPaymentId || p.id}</td>
+                    <td className="py-3.5 px-4 font-mono text-slate-700 font-bold">{p.cashfreePaymentId || p.id}</td>
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.bookingRef}</td>
-                    <td className="py-3.5 px-4 font-bold text-white">{p.customerName}</td>
+                    <td className="py-3.5 px-4 font-bold text-slate-900">{p.customerName}</td>
                     <td className="py-3.5 px-4 font-mono text-[10px] uppercase font-bold text-slate-500">{p.method}</td>
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-700 text-sm">₹{p.amount.toLocaleString()}</td>
                     <td className="py-3.5 px-4">

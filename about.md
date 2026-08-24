@@ -29,7 +29,7 @@ Welcome to the comprehensive documentation for **Hotel Rajhans International Man
 
 **Hotel Rajhans International** is a premier hospitality property located on MG Road, Kachari Chowk, Bhagalpur, Bihar. The **Rajhans HMS & Web Portal** is a modern, full-stack web application designed to serve two primary audiences:
 
-1. **Hotel Guests & Online Visitors**: A luxury digital storefront allowing guests to view room suites, check real-time availability, calculate dynamic tariffs with GST taxation, explore regional tourist attractions (Vikramshila University, Gangetic Dolphin Sanctuary, Mandar Hill, Ajgaivinath Temple), initiate instant WhatsApp inquiries, complete online payments via Razorpay and Cashfree Payment Gateways (UPI, Cards, Netbanking), and generate automated tax invoices.
+1. **Hotel Guests & Online Visitors**: A luxury digital storefront allowing guests to view room suites, check real-time availability, calculate dynamic tariffs with GST taxation, explore regional tourist attractions (Vikramshila University, Gangetic Dolphin Sanctuary, Mandar Hill, Ajgaivinath Temple), initiate instant WhatsApp inquiries, complete online payments via Cashfree Payment Gateway (UPI, Cards, Netbanking), and generate automated tax invoices.
 2. **Hotel Management & Operations Staff**: A secure, role-based administrative control panel allowing management to monitor key performance indicators (Revenue, Occupancy, Check-ins), control room inventories & pricing with intelligent tariff anomaly protection, manage reservations, track guest CRM profiles, manage CMS policies, and export financial analytics (XLSX, CSV, PDF).
 
 ---
@@ -48,7 +48,7 @@ The application is built on a modern, high-performance web development architect
 | **Database & ORM** | **Prisma ORM (v6.4)** | Type-safe database client and migration tool |
 | **Database Engine** | **SQLite / PostgreSQL** | Relational data persistence engine |
 | **Authentication** | **JOSE (JWT) + Bcrypt** | Stateless JWT authentication with HTTP-only cookies |
-| **Payment Gateways**| **Razorpay & Cashfree SDKs** | Dual payment gateway integration for UPI, Cards & Netbanking with webhook handling |
+| **Payment Gateway** | **Cashfree PG SDK** | Payment gateway integration for UPI, Cards & Netbanking with webhook handling |
 | **Exports & Reports**| **jsPDF, html2canvas, xlsx, json2csv** | Invoice generation and multi-format reporting exports |
 | **Email Service** | **Nodemailer** | SMTP transaction email service for booking receipts |
 
@@ -58,7 +58,7 @@ The application is built on a modern, high-performance web development architect
 
 ### High-Level Component Interaction
 
-The application follows a decoupled Next.js App Router architecture where client components interact with Next.js API Route handlers, which communicate with Prisma ORM and external integrations (Razorpay, Cashfree, SMTP).
+The application follows a decoupled Next.js App Router architecture where client components interact with Next.js API Route handlers, which communicate with Prisma ORM and external integrations (Cashfree PG, SMTP).
 
 ```mermaid
 graph TD
@@ -76,7 +76,7 @@ graph TD
 
     subgraph Application API Layer
         B -->|POST /api/bookings| I[Booking API Handler]
-        B -->|POST /api/payments/*| J[Payment API Handler - Razorpay / Cashfree]
+        B -->|POST /api/payments/*| J[Payment API Handler - Cashfree PG]
         E -->|GET /api/reports| K[Reports Aggregator API]
         E -->|PUT /api/rooms| L[Room Tariff Control API]
         E -->|GET /api/customers| M[Customer CRM API]
@@ -84,7 +84,7 @@ graph TD
 
     subgraph Integrations & Storage
         I -->|Check Availability & Create| N[(Prisma Database)]
-        J -->|Order Creation & Verification| O[Razorpay / Cashfree Gateway APIs]
+        J -->|Order Creation & Verification| O[Cashfree Gateway API]
         J -->|Send Booking Invoice Email| P[SMTP Email Server]
         K & L & M -->|Query & Persist| N
     end
@@ -150,8 +150,8 @@ erDiagram
     Payment {
         string id PK
         string bookingId FK
-        string razorpayOrderId
-        string razorpayPaymentId
+        string cashfreeOrderId
+        string cashfreePaymentId
         float amount
         enum status
     }
@@ -159,7 +159,7 @@ erDiagram
 
 ---
 
-### Booking & Dual Payment Gateway Sequence Flow
+### Booking & Payment Gateway Sequence Flow
 
 When a guest books a room online, the system executes a multi-step verification and transaction workflow:
 
@@ -170,7 +170,7 @@ sequenceDiagram
     participant Modal as BookingModal
     participant API as /api/bookings
     participant DB as Prisma Database
-    participant GW as Razorpay / Cashfree API
+    participant GW as Cashfree PG API
     participant Mail as SMTP Mailer
 
     Guest->>Modal: Select Dates, Room & Enter Guest Info
@@ -184,7 +184,7 @@ sequenceDiagram
         API-->>Modal: Return 409 Conflict Error
     end
 
-    Modal->>API: POST /api/payments/razorpay/create-order or cashfree/create-order
+    Modal->>API: POST /api/payments/cashfree/create-order
     API->>GW: Create Order (amount, currency, receipt)
     GW-->>API: Return Order ID & Session Credentials
     API-->>Modal: Return Gateway Credentials
@@ -273,7 +273,7 @@ This section explains the exact operational mechanics of every interactive butto
      2. Guest picks Check-In and Check-Out dates. The modal computes total nights and verifies room availability via `/api/bookings/check-availability`.
      3. Calculates itemized pricing: Base Room Rate × Nights + Extra Bed Charges + GST (12% or 18%).
      4. Guest fills in Name, Phone, Email, and Guest count.
-     5. Clicking **`Proceed to Payment`** creates a pending booking record (`HRJ-XXXX`) and launches Razorpay/Cashfree checkout.
+     5. Clicking **`Proceed to Payment`** creates a pending booking record (`HRJ-XXXX`) and launches Cashfree checkout.
      6. Upon successful payment verification, renders confirmation screen with option to **Download Tax Invoice PDF**.
 
 2. **`WhatsApp Us` Floating Action Button** (Bottom Right Corner):
@@ -353,7 +353,7 @@ The system relies on Prisma ORM configured with 14 relational models:
 | `Availability`| `id` (UUID) | Date-specific blockages/overrides | `roomId`, `date`, `status`, `reason` |
 | `Customer` | `id` (UUID) | Guest CRM records | `name`, `phone`, `email`, `vipStatus`, `visitCount`, `totalSpent` |
 | `Booking` | `id` (UUID) | Master reservation entries | `referenceId`, `customerId`, `roomId`, `checkIn`, `checkOut`, `netAmount`, `status` |
-| `Payment` | `id` (UUID) | Payment transactions & gateway logs | `bookingId`, `razorpayOrderId`, `razorpayPaymentId`, `amount`, `status` |
+| `Payment` | `id` (UUID) | Payment transactions & gateway logs | `bookingId`, `cashfreeOrderId`, `cashfreePaymentId`, `amount`, `status` |
 | `GalleryImage`| `id` (UUID) | Hotel photo gallery media | `url`, `alt`, `category`, `size`, `displayOrder` |
 | `ContactMessage`|`id` (UUID)| Contact form submissions | `name`, `email`, `phone`, `message`, `status`, `replyText` |
 | `Review` | `id` (UUID) | Customer testimonials | `authorName`, `rating`, `reviewText`, `source`, `status` |
@@ -377,8 +377,7 @@ The system relies on Prisma ORM configured with 14 relational models:
 | `POST` | `/api/bookings` | No | Checks date availability & creates a pending booking |
 | `POST` | `/api/bookings/check-availability` | No | Calculates dynamic night tariffs, taxes, and checks room overlap |
 | `PUT` | `/api/bookings/[id]` | Admin | Updates booking status (Check-In, Check-Out, Cancel) |
-| `POST` | `/api/payments/razorpay/create-order` | No | Generates Razorpay payment order for a booking |
-| `POST` | `/api/payments/razorpay/verify-signature` | No | Verifies Razorpay HMAC signature & confirms reservation |
+
 | `POST` | `/api/payments/cashfree/create-order` | No | Generates Cashfree payment session order |
 | `POST` | `/api/payments/cashfree/verify-payment` | No | Verifies Cashfree payment status & confirms reservation |
 | `POST` | `/api/payments/cashfree/webhook` | Webhook | Asynchronous webhook verification handler |
@@ -419,14 +418,10 @@ DATABASE_URL="file:./dev.db" # Or postgresql://user:pass@host:5432/rajhans
 # JWT Authentication Secret
 JWT_SECRET="your-super-secure-production-jwt-secret-key-32-chars-min"
 
-# Razorpay Payment Gateway Credentials
-RAZORPAY_KEY_ID="rzp_live_xxxxxxxxxxxx"
-RAZORPAY_KEY_SECRET="xxxxxxxxxxxxxxxxxxxxxxxx"
-
 # Cashfree Payment Gateway Credentials
-CASHFREE_APP_ID="your_cashfree_app_id"
-CASHFREE_SECRET_KEY="your_cashfree_secret_key"
-CASHFREE_ENVIRONMENT="TEST" # Or "PRODUCTION"
+CASHFREE_CLIENT_ID="your_cashfree_client_id"
+CASHFREE_CLIENT_SECRET="your_cashfree_client_secret"
+CASHFREE_ENV="SANDBOX" # Or "PRODUCTION"
 
 # SMTP Email Configuration
 SMTP_HOST="smtp.gmail.com"
@@ -483,7 +478,7 @@ Rajhans/
 │   │   ├── BookingModal.tsx        # Guest Booking & Tariff Calculator Modal
 │   │   ├── ImageGallery.tsx        # Interactive Media Lightbox
 │   │   └── LocationSection.tsx     # Google Maps & Connectivity Component
-│   ├── lib/                # Core Helper Modules (prisma.ts, auth.ts, razorpay.ts, cashfree.ts, mailer.ts, invoice.ts, location.ts)
+│   ├── lib/                # Core Helper Modules (prisma.ts, auth.ts, cashfree.ts, mailer.ts, invoice.ts, location.ts)
 │   ├── middleware.ts       # Route Authentication Guard Middleware
 │   └── types/              # TypeScript Ambient Declarations & Custom Interfaces
 ├── next.config.ts          # Next.js Application Configuration (basePath, images)

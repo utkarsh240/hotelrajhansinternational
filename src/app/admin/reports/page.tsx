@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FileSpreadsheet, RefreshCw } from "lucide-react";
-import { json2csv } from "json2csv";
+import { Parser } from "json2csv";
 
 export default function AdminReportsPage() {
   const [data, setData] = useState<any>(null);
@@ -38,7 +38,7 @@ export default function AdminReportsPage() {
     }));
 
     try {
-      const csv = json2csv(exportData);
+      const csv = new Parser().parse(exportData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

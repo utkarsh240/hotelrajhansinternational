@@ -6,8 +6,17 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding Hotel Rajhans International Database...");
 
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "admin123";
+  const managerPassword = process.env.SEED_MANAGER_PASSWORD || "manager123";
+
+  if (process.env.NODE_ENV === "production") {
+    if (!process.env.SEED_ADMIN_PASSWORD || !process.env.SEED_MANAGER_PASSWORD) {
+      throw new Error("SEED_ADMIN_PASSWORD and SEED_MANAGER_PASSWORD are required for production seeding.");
+    }
+  }
+
   // 1. Seed Super Admin User
-  const adminPasswordHash = await bcrypt.hash("admin123", 10);
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
   const adminUser = await prisma.user.upsert({
     where: { email: "admin@hotelrajhansinternational.com" },
     update: {},
@@ -22,7 +31,7 @@ async function main() {
   console.log("Created Admin user:", adminUser.email);
 
   // 2. Seed Manager Account
-  const managerPasswordHash = await bcrypt.hash("manager123", 10);
+  const managerPasswordHash = await bcrypt.hash(managerPassword, 10);
   await prisma.user.upsert({
     where: { email: "manager@hotelrajhansinternational.com" },
     update: {},

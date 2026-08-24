@@ -28,8 +28,8 @@ export async function POST(request: Request) {
       console.warn("Database lookup error in login route:", dbError);
     }
 
-    // Fallback authentication for default admin/manager accounts if DB fails or user not in DB
-    if (!user) {
+    // Local development fallback only; production must authenticate against the database.
+    if (!user && process.env.NODE_ENV !== "production") {
       if (cleanEmail === "admin@hotelrajhansinternational.com" && password === "admin123") {
         user = {
           id: "admin-fallback-id",
@@ -116,4 +116,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

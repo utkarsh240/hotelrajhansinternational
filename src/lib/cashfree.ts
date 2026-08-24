@@ -25,6 +25,12 @@ const BASE_URL =
     ? "https://api.cashfree.com/pg"
     : "https://sandbox.cashfree.com/pg";
 
+function maskCredential(value: string): string {
+  if (!value) return "missing";
+  if (value.length <= 8) return `${value.length} chars`;
+  return `${value.slice(0, 4)}...${value.slice(-4)} (${value.length} chars)`;
+}
+
 export interface CreateOrderParams {
   orderId: string;
   amount: number;
@@ -151,8 +157,15 @@ export async function createCashfreeOrder(
     console.error("Cashfree API Order Creation Error Response:", data);
     const msg = data.message || data.error || data.reason || "Cashfree API request failed";
     if (/auth/i.test(String(msg))) {
+      console.error("Cashfree credential diagnostics:", {
+        environment: CASHFREE_ENV,
+        baseUrl: BASE_URL,
+        clientId: maskCredential(CASHFREE_CLIENT_ID),
+        secretKey: maskCredential(CASHFREE_SECRET_KEY),
+        apiVersion: CASHFREE_API_VERSION,
+      });
       throw new Error(
-        `Cashfree authentication failed for ${CASHFREE_ENV}. Check that CASHFREE_CLIENT_ID/CASHFREE_APP_ID and CASHFREE_CLIENT_SECRET/CASHFREE_SECRET_KEY are from the same Cashfree ${CASHFREE_ENV.toLowerCase()} account.`
+        "Payment gateway authentication failed. Please contact the hotel to complete this booking."
       );
     }
     throw new Error(`Cashfree Gateway Error: ${msg}`);

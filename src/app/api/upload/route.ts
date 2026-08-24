@@ -5,6 +5,9 @@ import path from "path";
 
 export const revalidate = 0;
 
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
 export async function POST(request: Request) {
   try {
     const session = await getSession();
@@ -17,6 +20,21 @@ export async function POST(request: Request) {
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+      return NextResponse.json({ error: "Only image uploads are allowed" }, { status: 400 });
+    }
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ error: "Image must be 5MB or smaller" }, { status: 400 });
+    }
+
+    if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "Persistent image uploads require configured object storage in production." },
+        { status: 501 }
+      );
     }
 
     const bytes = await file.arrayBuffer();

@@ -68,7 +68,7 @@ export default function AdminSettingsPage() {
             System & Tax Parameters
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
-            Super Admin operational rules, GSTIN number, check-in/out policies, and Razorpay configurations.
+            Super Admin operational rules, GSTIN number, check-in/out policies, and Cashfree configurations.
           </p>
         </div>
       </div>
@@ -97,10 +97,10 @@ export default function AdminSettingsPage() {
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-700 font-bold mb-1">Razorpay Key ID</label>
+              <label className="block text-xs uppercase tracking-widest text-slate-700 font-bold mb-1">Cashfree Client ID</label>
               <input
                 type="text"
-                value={process.env.RAZORPAY_KEY_ID || "rzp_test_rajhans123"}
+                value="Configured in deployment environment"
                 disabled
                 className="w-full bg-slate-50/70 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-500 font-mono font-bold"
               />
