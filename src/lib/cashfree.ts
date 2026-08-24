@@ -1,12 +1,20 @@
 import crypto from "crypto";
 
-const CASHFREE_APP_ID = (process.env.CASHFREE_APP_ID || "").trim();
-const CASHFREE_SECRET_KEY = (process.env.CASHFREE_SECRET_KEY || "").trim();
+const CASHFREE_CLIENT_ID = (
+  process.env.CASHFREE_CLIENT_ID ||
+  process.env.CASHFREE_APP_ID ||
+  ""
+).trim();
+const CASHFREE_SECRET_KEY = (
+  process.env.CASHFREE_CLIENT_SECRET ||
+  process.env.CASHFREE_SECRET_KEY ||
+  ""
+).trim();
 
 const EXPLICIT_ENV = (process.env.CASHFREE_ENV || "").toUpperCase();
 const CASHFREE_ENV = EXPLICIT_ENV === "PRODUCTION" || EXPLICIT_ENV === "SANDBOX"
   ? EXPLICIT_ENV
-  : CASHFREE_APP_ID.startsWith("TEST")
+  : CASHFREE_CLIENT_ID.startsWith("TEST")
   ? "SANDBOX"
   : "PRODUCTION";
 
@@ -77,7 +85,7 @@ function normalizePaymentStatus(value: unknown): CashfreePaymentStatus {
 }
 
 export function isCashfreeConfigured(): boolean {
-  return Boolean(CASHFREE_APP_ID && CASHFREE_SECRET_KEY);
+  return Boolean(CASHFREE_CLIENT_ID && CASHFREE_SECRET_KEY);
 }
 
 export function canUseCashfreeSimulation(): boolean {
@@ -129,7 +137,7 @@ export async function createCashfreeOrder(
   const res = await fetch(`${BASE_URL}/orders`, {
     method: "POST",
     headers: {
-      "x-client-id": CASHFREE_APP_ID,
+      "x-client-id": CASHFREE_CLIENT_ID,
       "x-client-secret": CASHFREE_SECRET_KEY,
       "x-api-version": CASHFREE_API_VERSION,
       "Content-Type": "application/json",
@@ -142,6 +150,11 @@ export async function createCashfreeOrder(
   if (!res.ok) {
     console.error("Cashfree API Order Creation Error Response:", data);
     const msg = data.message || data.error || data.reason || "Cashfree API request failed";
+    if (/auth/i.test(String(msg))) {
+      throw new Error(
+        `Cashfree authentication failed for ${CASHFREE_ENV}. Check that CASHFREE_CLIENT_ID/CASHFREE_APP_ID and CASHFREE_CLIENT_SECRET/CASHFREE_SECRET_KEY are from the same Cashfree ${CASHFREE_ENV.toLowerCase()} account.`
+      );
+    }
     throw new Error(`Cashfree Gateway Error: ${msg}`);
   }
 
@@ -186,7 +199,7 @@ export async function fetchCashfreeOrderPayments(
     const orderRes = await fetch(`${BASE_URL}/orders/${orderId}`, {
       method: "GET",
       headers: {
-        "x-client-id": CASHFREE_APP_ID,
+        "x-client-id": CASHFREE_CLIENT_ID,
         "x-client-secret": CASHFREE_SECRET_KEY,
         "x-api-version": CASHFREE_API_VERSION,
       },
@@ -204,7 +217,7 @@ export async function fetchCashfreeOrderPayments(
     const paymentsRes = await fetch(`${BASE_URL}/orders/${orderId}/payments`, {
       method: "GET",
       headers: {
-        "x-client-id": CASHFREE_APP_ID,
+        "x-client-id": CASHFREE_CLIENT_ID,
         "x-client-secret": CASHFREE_SECRET_KEY,
         "x-api-version": CASHFREE_API_VERSION,
       },
