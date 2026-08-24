@@ -5,18 +5,20 @@ const CASHFREE_CLIENT_ID = (
   process.env.CASHFREE_APP_ID ||
   ""
 ).trim();
-const CASHFREE_SECRET_KEY = (
+
+const CASHFREE_CLIENT_SECRET = (
   process.env.CASHFREE_CLIENT_SECRET ||
   process.env.CASHFREE_SECRET_KEY ||
   ""
 ).trim();
 
 const EXPLICIT_ENV = (process.env.CASHFREE_ENV || "").toUpperCase();
-const CASHFREE_ENV = EXPLICIT_ENV === "PRODUCTION" || EXPLICIT_ENV === "SANDBOX"
-  ? EXPLICIT_ENV
-  : CASHFREE_CLIENT_ID.startsWith("TEST")
-  ? "SANDBOX"
-  : "PRODUCTION";
+const CASHFREE_ENV =
+  EXPLICIT_ENV === "PRODUCTION" || EXPLICIT_ENV === "SANDBOX"
+    ? EXPLICIT_ENV
+    : CASHFREE_CLIENT_ID.startsWith("TEST")
+    ? "SANDBOX"
+    : "PRODUCTION";
 
 const CASHFREE_API_VERSION = process.env.CASHFREE_API_VERSION || "2023-08-01";
 
@@ -24,12 +26,6 @@ const BASE_URL =
   CASHFREE_ENV === "PRODUCTION"
     ? "https://api.cashfree.com/pg"
     : "https://sandbox.cashfree.com/pg";
-
-function maskCredential(value: string): string {
-  if (!value) return "missing";
-  if (value.length <= 8) return `${value.length} chars`;
-  return `${value.slice(0, 4)}...${value.slice(-4)} (${value.length} chars)`;
-}
 
 export interface CreateOrderParams {
   orderId: string;
@@ -63,22 +59,18 @@ export interface CashfreePaymentAttempt {
   payment_group?: string;
 }
 
-type CashfreePaymentStatus = CashfreePaymentAttempt["payment_status"];
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+export function getCashfreeEnvironment(): "PRODUCTION" | "SANDBOX" {
+  return CASHFREE_ENV as "PRODUCTION" | "SANDBOX";
 }
 
-function getString(value: unknown): string | undefined {
-  return typeof value === "string" ? value : undefined;
+export function isCashfreeConfigured(): boolean {
+  return Boolean(CASHFREE_CLIENT_ID && CASHFREE_CLIENT_SECRET);
 }
 
-function getNumber(value: unknown): number | undefined {
-  return typeof value === "number" ? value : undefined;
-}
-
-function normalizePaymentStatus(value: unknown): CashfreePaymentStatus {
-  const status = getString(value)?.toUpperCase();
+function normalizePaymentStatus(
+  value: unknown
+): CashfreePaymentAttempt["payment_status"] {
+  const status = typeof value === "string" ? value.toUpperCase() : "";
   if (
     status === "SUCCESS" ||
     status === "FAILED" ||
@@ -90,61 +82,62 @@ function normalizePaymentStatus(value: unknown): CashfreePaymentStatus {
   return "PENDING";
 }
 
-export function isCashfreeConfigured(): boolean {
-  return Boolean(CASHFREE_CLIENT_ID && CASHFREE_SECRET_KEY);
-}
-
-export function canUseCashfreeSimulation(): boolean {
-  return !isCashfreeConfigured() && CASHFREE_ENV !== "PRODUCTION" && process.env.NODE_ENV !== "production";
-}
-
 /**
- * Creates an official order on Cashfree PG
+ * Creates an official order on Cashfree Payment Gateway
  */
 export async function createCashfreeOrder(
   params: CreateOrderParams
 ): Promise<CashfreeOrderResponse> {
+  // Input Validation
+  if (!params.orderId || typeof params.orderId !== "string") {
+    throw new Error("Order ID is required to create a Cashfree order.");
+  }
+  if (!params.amount || typeof params.amount !== "number" || params.amount <= 0) {
+    throw new Error("Order amount must be a positive number.");
+  }
+  if (!params.customerId) {
+    throw new Error("Customer ID is required to create a Cashfree order.");
+  }
+
+  if (!isCashfreeConfigured()) {
+    throw new Error(
+      "Cashfree credentials are not configured. Please set CASHFREE_CLIENT_ID and CASHFREE_CLIENT_SECRET."
+    );
+  }
+
+  // Format customer phone to 10 digits
   let cleanPhone = (params.customerPhone || "").replace(/[^0-9]/g, "");
   if (cleanPhone.length > 10) cleanPhone = cleanPhone.slice(-10);
   if (cleanPhone.length < 10) cleanPhone = "9999999999";
+
+  // Sanitize customer ID (alphanumeric, _, -)
+  const cleanCustomerId = params.customerId
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .substring(0, 50);
 
   const payload = {
     order_id: params.orderId,
     order_amount: Math.round(params.amount * 100) / 100,
     order_currency: params.currency || "INR",
     customer_details: {
-      customer_id: params.customerId.replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 50),
+      customer_id: cleanCustomerId,
       customer_name: params.customerName || "Guest User",
       customer_email: params.customerEmail || "guest@hotelrajhansinternational.com",
       customer_phone: cleanPhone,
     },
     order_meta: {
-      return_url: params.returnUrl || `${process.env.NEXT_PUBLIC_APP_URL || "https://hotelrajhansinternational.com"}?order_id={order_id}`,
+      return_url:
+        params.returnUrl ||
+        `${process.env.NEXT_PUBLIC_APP_URL || "https://hotelrajhansinternational.com"}?order_id={order_id}`,
     },
     order_note: params.orderNote || `Booking ${params.orderId}`,
   };
-
-  if (!isCashfreeConfigured()) {
-    if (!canUseCashfreeSimulation()) {
-      throw new Error("Cashfree credentials are not configured.");
-    }
-
-    console.warn("Cashfree API keys unconfigured in local sandbox mode, using development simulation session.");
-    return {
-      cf_order_id: `cf_sim_${Date.now()}`,
-      order_id: params.orderId,
-      payment_session_id: `session_mock_${Date.now()}`,
-      order_status: "ACTIVE",
-      order_amount: payload.order_amount,
-      order_currency: "INR",
-    };
-  }
 
   const res = await fetch(`${BASE_URL}/orders`, {
     method: "POST",
     headers: {
       "x-client-id": CASHFREE_CLIENT_ID,
-      "x-client-secret": CASHFREE_SECRET_KEY,
+      "x-client-secret": CASHFREE_CLIENT_SECRET,
       "x-api-version": CASHFREE_API_VERSION,
       "Content-Type": "application/json",
     },
@@ -154,21 +147,15 @@ export async function createCashfreeOrder(
   const data = await res.json();
 
   if (!res.ok) {
-    console.error("Cashfree API Order Creation Error Response:", data);
-    const msg = data.message || data.error || data.reason || "Cashfree API request failed";
-    if (/auth/i.test(String(msg))) {
-      console.error("Cashfree credential diagnostics:", {
-        environment: CASHFREE_ENV,
-        baseUrl: BASE_URL,
-        clientId: maskCredential(CASHFREE_CLIENT_ID),
-        secretKey: maskCredential(CASHFREE_SECRET_KEY),
-        apiVersion: CASHFREE_API_VERSION,
-      });
-      throw new Error(
-        "Payment gateway authentication failed. Please contact the hotel to complete this booking."
-      );
-    }
-    throw new Error(`Cashfree Gateway Error: ${msg}`);
+    console.error("Cashfree API Order Creation Failed:", {
+      status: res.status,
+      environment: CASHFREE_ENV,
+      baseUrl: BASE_URL,
+      response: data,
+    });
+    const message =
+      data.message || data.error || data.reason || `HTTP ${res.status} error`;
+    throw new Error(`Cashfree Order Error: ${message}`);
   }
 
   return {
@@ -182,28 +169,12 @@ export async function createCashfreeOrder(
 }
 
 /**
- * Fetches payments for a given Cashfree order ID to verify status server-side
+ * Fetches order details and payment attempts from Cashfree PG
  */
 export async function fetchCashfreeOrderPayments(
   orderId: string
 ): Promise<{ orderStatus: string; payments: CashfreePaymentAttempt[] }> {
   if (!isCashfreeConfigured()) {
-    if (canUseCashfreeSimulation() && orderId.startsWith("cf_")) {
-      return {
-        orderStatus: "PAID",
-        payments: [
-          {
-            cf_payment_id: `cf_pay_sim_${Date.now()}`,
-            order_id: orderId,
-            payment_status: "SUCCESS",
-            payment_amount: 0,
-            payment_currency: "INR",
-            payment_message: "Local Cashfree simulation",
-          },
-        ],
-      };
-    }
-
     throw new Error("Cashfree credentials are not configured.");
   }
 
@@ -213,60 +184,55 @@ export async function fetchCashfreeOrderPayments(
       method: "GET",
       headers: {
         "x-client-id": CASHFREE_CLIENT_ID,
-        "x-client-secret": CASHFREE_SECRET_KEY,
+        "x-client-secret": CASHFREE_CLIENT_SECRET,
         "x-api-version": CASHFREE_API_VERSION,
       },
     });
 
     const orderData = await orderRes.json();
     if (!orderRes.ok) {
-      console.error("Cashfree API Order Fetch Error Response:", orderData);
+      console.error("Cashfree API Order Fetch Failed:", orderData);
       return { orderStatus: "UNKNOWN", payments: [] };
     }
 
-    const orderStatus = isRecord(orderData) ? getString(orderData.order_status) || "UNKNOWN" : "UNKNOWN";
+    const orderStatus =
+      typeof orderData.order_status === "string"
+        ? orderData.order_status
+        : "UNKNOWN";
 
-    // 2. Fetch Payments Details
+    // 2. Fetch Payment Attempts
     const paymentsRes = await fetch(`${BASE_URL}/orders/${orderId}/payments`, {
       method: "GET",
       headers: {
         "x-client-id": CASHFREE_CLIENT_ID,
-        "x-client-secret": CASHFREE_SECRET_KEY,
+        "x-client-secret": CASHFREE_CLIENT_SECRET,
         "x-api-version": CASHFREE_API_VERSION,
       },
     });
 
     const paymentsData = await paymentsRes.json();
     if (!paymentsRes.ok) {
-      console.error("Cashfree API Payments Fetch Error Response:", paymentsData);
+      console.error("Cashfree API Payments Fetch Failed:", paymentsData);
       return { orderStatus, payments: [] };
     }
 
-    const paymentsList: CashfreePaymentAttempt[] = Array.isArray(paymentsData)
-      ? paymentsData
-          .filter(isRecord)
-          .map((p) => ({
-            cf_payment_id: String(p.cf_payment_id || p.payment_id || ""),
-            order_id: getString(p.order_id) || orderId,
-            payment_status: normalizePaymentStatus(p.payment_status),
-            payment_amount: getNumber(p.payment_amount) || 0,
-            payment_currency: getString(p.payment_currency) || "INR",
-            payment_message: getString(p.payment_message),
-            payment_time: getString(p.payment_time),
-            payment_group: getString(p.payment_group),
-          }))
+    const payments: CashfreePaymentAttempt[] = Array.isArray(paymentsData)
+      ? paymentsData.map((p: any) => ({
+          cf_payment_id: String(p.cf_payment_id || p.payment_id || ""),
+          order_id: String(p.order_id || orderId),
+          payment_status: normalizePaymentStatus(p.payment_status),
+          payment_amount: Number(p.payment_amount) || 0,
+          payment_currency: String(p.payment_currency || "INR"),
+          payment_message: p.payment_message,
+          payment_time: p.payment_time,
+          payment_group: p.payment_group,
+        }))
       : [];
 
-    return {
-      orderStatus,
-      payments: paymentsList,
-    };
+    return { orderStatus, payments };
   } catch (error) {
-    console.error("Fetch Cashfree Order Error:", error);
-    return {
-      orderStatus: "UNKNOWN",
-      payments: [],
-    };
+    console.error("Fetch Cashfree Order Payments Error:", error);
+    return { orderStatus: "UNKNOWN", payments: [] };
   }
 }
 
@@ -275,36 +241,31 @@ export async function fetchCashfreeOrderPayments(
  */
 export function verifyCashfreeWebhookSignature(
   rawBody: string,
-  signature: string,
-  timestamp: string
+  timestamp: string,
+  signature: string
 ): boolean {
-  if (!signature || !timestamp) return false;
-  if (!isCashfreeConfigured()) {
-    return canUseCashfreeSimulation() && signature === "verified_mock_signature";
-  }
+  if (!signature || !timestamp || !rawBody) return false;
+  if (!CASHFREE_CLIENT_SECRET) return false;
 
   try {
     const dataToSign = timestamp + rawBody;
-    const computedSignatureBase64 = crypto
-      .createHmac("sha256", CASHFREE_SECRET_KEY)
+
+    const computedBase64 = crypto
+      .createHmac("sha256", CASHFREE_CLIENT_SECRET)
       .update(dataToSign)
       .digest("base64");
 
-    const computedSignatureHex = crypto
-      .createHmac("sha256", CASHFREE_SECRET_KEY)
+    const computedHex = crypto
+      .createHmac("sha256", CASHFREE_CLIENT_SECRET)
       .update(dataToSign)
       .digest("hex");
 
     return (
-      computedSignatureBase64 === signature ||
-      computedSignatureHex === signature
+      computedBase64 === signature ||
+      computedHex === signature
     );
   } catch (err) {
-    console.error("Cashfree Webhook Signature Verification Error:", err);
+    console.error("Webhook signature calculation exception:", err);
     return false;
   }
-}
-
-export function getCashfreeEnvironment(): string {
-  return CASHFREE_ENV;
 }

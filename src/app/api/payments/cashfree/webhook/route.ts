@@ -9,19 +9,24 @@ export const revalidate = 0;
 
 export async function POST(request: Request) {
   try {
+    // 1. Read Raw Body (Crucial for HMAC SHA256 calculation)
     const rawBody = await request.text();
     const signature = request.headers.get("x-webhook-signature") || "";
     const timestamp = request.headers.get("x-webhook-timestamp") || "";
 
-    // 1. Verify Webhook HMAC Signature
-    const isValidSignature = verifyCashfreeWebhookSignature(rawBody, signature, timestamp);
+    // 2. Cryptographic Signature Verification
+    const isValidSignature = verifyCashfreeWebhookSignature(rawBody, timestamp, signature);
 
     if (!isValidSignature) {
-      console.warn("Cashfree Webhook Signature Mismatch Warning");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+      console.warn("Cashfree Webhook Signature Verification Failed:", {
+        signature,
+        timestamp,
+        bodyPreview: rawBody.slice(0, 100),
+      });
+      return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
     }
 
-    // 2. Parse Webhook Event Body
+    // 3. Parse JSON Body
     let payload: any = {};
     try {
       payload = JSON.parse(rawBody);
@@ -38,10 +43,10 @@ export async function POST(request: Request) {
     const paymentStatus = paymentData.payment_status || orderData.order_status;
 
     if (!orderId) {
-      return NextResponse.json({ status: "OK", message: "Ignored: No orderId" });
+      return NextResponse.json({ status: "OK", message: "Ignored: Missing orderId" }, { status: 200 });
     }
 
-    // Find payment record in database
+    // 4. Find Payment Record in Database
     const paymentRecord = await prisma.payment.findFirst({
       where: { cashfreeOrderId: orderId },
       include: {
@@ -52,21 +57,18 @@ export async function POST(request: Request) {
     });
 
     if (!paymentRecord || !paymentRecord.booking) {
-      console.warn(`Cashfree Webhook: Payment record for order ${orderId} not found`);
-      return NextResponse.json({ status: "OK", message: "Payment record not found" });
+      console.warn(`Cashfree Webhook: Payment record for order ${orderId} not found.`);
+      return NextResponse.json({ status: "OK", message: "Payment record not found" }, { status: 200 });
     }
 
     const booking = paymentRecord.booking;
 
-    // 3. Idempotent Processing Check
+    // 5. Idempotent Skip
     if (booking.status === "CONFIRMED") {
-      return NextResponse.json({
-        status: "OK",
-        message: "Idempotent: Booking already confirmed",
-      });
+      return NextResponse.json({ status: "OK", message: "Idempotent: Booking already confirmed" }, { status: 200 });
     }
 
-    // 4. Process Payment Success Event
+    // 6. Process Payment Success Event
     if (
       eventType === "PAYMENT_SUCCESS_WEBHOOK" ||
       paymentStatus === "SUCCESS" ||
@@ -90,7 +92,7 @@ export async function POST(request: Request) {
         }),
       ]);
 
-      // Trigger Email Confirmation (Non-blocking: failures will not reverse confirmed booking)
+      // Non-blocking Email Notification
       if (booking.customer.email) {
         try {
           const emailHtml = generateConfirmationEmailHTML({
@@ -111,7 +113,7 @@ export async function POST(request: Request) {
             netAmount: booking.netAmount,
             paidAmount: booking.netAmount,
             paymentStatus: "SUCCESS",
-            paymentMethod: "UPI / Cards (Cashfree Webhook Verified)",
+            paymentMethod: "Cashfree Webhook Verified",
             gstin: "10AAAAA0000A1Z5",
             createdAt: new Date(),
             hotelAddress: "Kachari Chowk, MG Road, Bhagalpur, Bihar - 812001",
@@ -120,32 +122,32 @@ export async function POST(request: Request) {
             railwayDistance: "Bhagalpur Junction Railway Station (BGP): ~2.5 km (10-15 mins drive)",
           });
 
-          const isSent = await sendEmailNotification({
+          sendEmailNotification({
             to: booking.customer.email,
             subject: `Booking Confirmed (${booking.referenceId}) - Hotel Rajhans International`,
             html: emailHtml,
-          });
+          }).catch((err) => console.error("Webhook email notification error:", err));
 
-          await prisma.auditLog.create({
-            data: {
-              userId: null,
-              userName: "System (Cashfree Webhook)",
-              action: "SEND_CONFIRMATION_EMAIL",
-              entity: "Booking",
-              entityId: booking.id,
-              details: isSent
-                ? `Webhook confirmation email delivered to ${booking.customer.email}`
-                : `Webhook email dispatch logged (Simulation / SMTP response) for ${booking.customer.email}`,
-            },
-          });
-        } catch (emailErr) {
-          console.error("Cashfree Webhook Email Send Error:", emailErr);
+          prisma.auditLog
+            .create({
+              data: {
+                userId: null,
+                userName: "System (Cashfree Webhook)",
+                action: "SEND_CONFIRMATION_EMAIL",
+                entity: "Booking",
+                entityId: booking.id,
+                details: `Webhook confirmation email dispatched for ${booking.customer.email}`,
+              },
+            })
+            .catch(() => {});
+        } catch (mailErr) {
+          console.error("Webhook email formatting error:", mailErr);
         }
       }
 
-      // Synchronize Confirmed Booking to Google Sheets (Non-blocking & Idempotent)
+      // Non-blocking Google Sheets Synchronization
       try {
-        const syncRes = await syncBookingToGoogleSheet({
+        syncBookingToGoogleSheet({
           bookingReference: booking.referenceId,
           bookingDate: booking.createdAt,
           customerName: booking.customer.name,
@@ -158,30 +160,15 @@ export async function POST(request: Request) {
           netAmount: booking.netAmount,
           paymentStatus: "SUCCESS",
           bookingStatus: "CONFIRMED",
-        });
-
-        await prisma.auditLog.create({
-          data: {
-            userId: null,
-            userName: "System (Cashfree Webhook Sync)",
-            action: "SYNC_GOOGLE_SHEETS",
-            entity: "Booking",
-            entityId: booking.id,
-            details: syncRes.duplicated
-              ? `Google Sheets webhook sync skipped (Reference ${booking.referenceId} already exists)`
-              : syncRes.success
-              ? `Synced ${booking.referenceId} to Google Sheets ('Bookings' tab)`
-              : `Google Sheets webhook sync failed for ${booking.referenceId}`,
-          },
-        });
+        }).catch((err) => console.error("Webhook Google Sheets sync error:", err));
       } catch (sheetErr) {
-        console.error("Non-blocking webhook Google Sheets sync error:", sheetErr);
+        console.error("Webhook Google Sheets payload error:", sheetErr);
       }
     }
 
-    return NextResponse.json({ status: "OK" });
+    return NextResponse.json({ status: "OK" }, { status: 200 });
   } catch (error) {
-    console.error("Cashfree Webhook Processing Error:", error);
+    console.error("Cashfree Webhook Exception:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

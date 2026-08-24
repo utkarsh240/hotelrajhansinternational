@@ -1,48 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createCashfreeOrder, getCashfreeEnvironment } from "@/lib/cashfree";
-import type { Booking, Customer, Room } from "@prisma/client";
 
 export const revalidate = 0;
-
-type BookingWithDetails = Booking & {
-  customer: Customer;
-  room: Room;
-};
 
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
     const { bookingId } = body;
 
-    if (!bookingId) {
-      return NextResponse.json({ success: false, error: "Booking ID is required" }, { status: 400 });
-    }
-
-    let booking: BookingWithDetails | null = null;
-    try {
-      if (prisma && prisma.booking) {
-        booking = await prisma.booking.findUnique({
-          where: { id: bookingId },
-          include: { customer: true, room: true },
-        });
-      }
-    } catch (dbErr) {
-      console.warn("Database lookup warning in create-order:", dbErr);
+    if (!bookingId || typeof bookingId !== "string") {
       return NextResponse.json(
-        { success: false, error: "Unable to load booking for payment." },
-        { status: 500 }
+        { success: false, error: "Booking ID is required." },
+        { status: 400 }
       );
     }
 
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { customer: true, room: true },
+    });
+
     if (!booking) {
       return NextResponse.json(
-        { success: false, error: "Booking not found" },
+        { success: false, error: "Booking not found." },
         { status: 404 }
       );
     }
 
-    // Generate unique Cashfree order ID based on booking reference
+    // Generate unique Cashfree order ID
     const orderId = `cf_${booking.referenceId.replace(/[^a-zA-Z0-9_-]/g, "_")}_${Date.now()}`;
 
     // Create Cashfree Order
@@ -57,24 +43,18 @@ export async function POST(request: Request) {
       orderNote: `Hotel Rajhans Reservation ${booking.referenceId}`,
     });
 
-    // Store Payment record in Database with status PENDING (safely wrapped)
-    try {
-      if (prisma && prisma.payment) {
-        await prisma.payment.create({
-          data: {
-            bookingId: booking.id,
-            cashfreeOrderId: cashfreeOrder.order_id,
-            amount: booking.netAmount,
-            currency: "INR",
-            method: "UPI",
-            status: "PENDING",
-            gatewayResponse: JSON.stringify(cashfreeOrder),
-          },
-        });
-      }
-    } catch (payDbErr) {
-      console.warn("Payment record DB logging warning:", payDbErr);
-    }
+    // Save Payment record in Database (PENDING)
+    await prisma.payment.create({
+      data: {
+        bookingId: booking.id,
+        cashfreeOrderId: cashfreeOrder.order_id,
+        amount: booking.netAmount,
+        currency: "INR",
+        method: "UPI",
+        status: "PENDING",
+        gatewayResponse: JSON.stringify(cashfreeOrder),
+      },
+    });
 
     return NextResponse.json({
       success: true,
@@ -84,13 +64,15 @@ export async function POST(request: Request) {
       environment: getCashfreeEnvironment(),
     });
   } catch (error: unknown) {
-    console.error("Create Cashfree Order Error:", error);
+    console.error("Create Cashfree Order Route Exception:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to initialize payment session";
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to initialize payment session",
+        error: errorMessage,
       },
-      { status: 400 }
+      { status: 500 }
     );
   }
 }
