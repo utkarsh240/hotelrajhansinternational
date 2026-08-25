@@ -103,44 +103,51 @@ export async function POST(request: Request) {
       });
     });
 
-    // 4. Non-blocking Post-Payment Notifications (Email & Google Sheets)
-    if (booking.customer.email) {
-      try {
-        const emailHtml = generateConfirmationEmailHTML({
-          bookingReference: refId,
-          customerName: booking.customer.name,
-          customerPhone: booking.customer.phone,
-          customerEmail: booking.customer.email,
-          customerAddress: booking.customer.address,
-          roomName: booking.room.name,
-          checkIn: booking.checkIn,
-          checkOut: booking.checkOut,
-          guestsCount: booking.guestsCount,
-          roomsCount: 1,
-          basePrice: booking.room.basePriceDouble,
-          totalAmount: booking.totalAmount,
-          taxAmount: booking.taxAmount,
-          discountAmount: booking.discountAmount,
-          netAmount: booking.netAmount,
-          paidAmount: booking.netAmount,
-          paymentStatus: "SUCCESS",
-          paymentMethod: "Cashfree PG Verified",
-          gstin: "10AAAAA0000A1Z5",
-          createdAt: new Date(),
-          hotelAddress: "Kachari Chowk, MG Road, Bhagalpur, Bihar - 812001",
-          hotelPhone: "+91 93081 89201 / +91 641 2400000",
-          googleMapsUrl: "https://maps.app.goo.gl/77AAPZ7hRje8Nrmk9",
-          railwayDistance: "Bhagalpur Junction Railway Station (BGP): ~2.5 km (10-15 mins drive)",
-        });
+    // 4. Non-blocking Post-Payment Notifications (Guest + Hotel Admin Copy)
+    try {
+      const emailHtml = generateConfirmationEmailHTML({
+        bookingReference: refId,
+        customerName: booking.customer.name,
+        customerPhone: booking.customer.phone,
+        customerEmail: booking.customer.email || "N/A",
+        customerAddress: booking.customer.address,
+        roomName: booking.room.name,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        guestsCount: booking.guestsCount,
+        roomsCount: 1,
+        basePrice: booking.room.basePriceDouble,
+        totalAmount: booking.totalAmount,
+        taxAmount: booking.taxAmount,
+        discountAmount: booking.discountAmount,
+        netAmount: booking.netAmount,
+        paidAmount: booking.netAmount,
+        paymentStatus: "SUCCESS",
+        paymentMethod: "Cashfree PG Verified",
+        gstin: "10AAAAA0000A1Z5",
+        createdAt: new Date(),
+        hotelAddress: "Kachari Chowk, MG Road, Bhagalpur, Bihar - 812001",
+        hotelPhone: "+91 93081 89201 / +91 641 2400000",
+        googleMapsUrl: "https://maps.app.goo.gl/77AAPZ7hRje8Nrmk9",
+        railwayDistance: "Bhagalpur Junction Railway Station (BGP): ~2.5 km (10-15 mins drive)",
+      });
 
-        sendEmailNotification({
-          to: booking.customer.email,
-          subject: `Booking Confirmed (${refId}) - Hotel Rajhans International`,
-          html: emailHtml,
-        }).catch((err) => console.error("Non-blocking email send error:", err));
-      } catch (err) {
-        console.error("Confirmation email template generation error:", err);
-      }
+      // Send to both Guest & Hotel Official Admin Inbox
+      const recipientEmails = Array.from(
+        new Set([
+          booking.customer.email,
+          "info@hotelrajhansinternational.com",
+          "rajhansinternational.info@gmail.com",
+        ].filter(Boolean))
+      ).join(", ");
+
+      sendEmailNotification({
+        to: recipientEmails,
+        subject: `New Confirmed Booking (${refId}) - Hotel Rajhans International`,
+        html: emailHtml,
+      }).catch((err) => console.error("Non-blocking email send error:", err));
+    } catch (err) {
+      console.error("Confirmation email template generation error:", err);
     }
 
     try {

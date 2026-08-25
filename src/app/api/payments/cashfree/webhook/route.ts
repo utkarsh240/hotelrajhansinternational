@@ -92,57 +92,63 @@ export async function POST(request: Request) {
         }),
       ]);
 
-      // Non-blocking Email Notification
-      if (booking.customer.email) {
-        try {
-          const emailHtml = generateConfirmationEmailHTML({
-            bookingReference: booking.referenceId,
-            customerName: booking.customer.name,
-            customerPhone: booking.customer.phone,
-            customerEmail: booking.customer.email,
-            customerAddress: booking.customer.address,
-            roomName: booking.room.name,
-            checkIn: booking.checkIn,
-            checkOut: booking.checkOut,
-            guestsCount: booking.guestsCount,
-            roomsCount: 1,
-            basePrice: booking.room.basePriceDouble,
-            totalAmount: booking.totalAmount,
-            taxAmount: booking.taxAmount,
-            discountAmount: booking.discountAmount,
-            netAmount: booking.netAmount,
-            paidAmount: booking.netAmount,
-            paymentStatus: "SUCCESS",
-            paymentMethod: "Cashfree Webhook Verified",
-            gstin: "10AAAAA0000A1Z5",
-            createdAt: new Date(),
-            hotelAddress: "Kachari Chowk, MG Road, Bhagalpur, Bihar - 812001",
-            hotelPhone: "+91 93081 89201 / +91 641 2400000",
-            googleMapsUrl: "https://maps.app.goo.gl/77AAPZ7hRje8Nrmk9",
-            railwayDistance: "Bhagalpur Junction Railway Station (BGP): ~2.5 km (10-15 mins drive)",
-          });
+      // Non-blocking Email Notification (Guest + Hotel Official Admin Inbox)
+      try {
+        const emailHtml = generateConfirmationEmailHTML({
+          bookingReference: booking.referenceId,
+          customerName: booking.customer.name,
+          customerPhone: booking.customer.phone,
+          customerEmail: booking.customer.email || "N/A",
+          customerAddress: booking.customer.address,
+          roomName: booking.room.name,
+          checkIn: booking.checkIn,
+          checkOut: booking.checkOut,
+          guestsCount: booking.guestsCount,
+          roomsCount: 1,
+          basePrice: booking.room.basePriceDouble,
+          totalAmount: booking.totalAmount,
+          taxAmount: booking.taxAmount,
+          discountAmount: booking.discountAmount,
+          netAmount: booking.netAmount,
+          paidAmount: booking.netAmount,
+          paymentStatus: "SUCCESS",
+          paymentMethod: "Cashfree Webhook Verified",
+          gstin: "10AAAAA0000A1Z5",
+          createdAt: new Date(),
+          hotelAddress: "Kachari Chowk, MG Road, Bhagalpur, Bihar - 812001",
+          hotelPhone: "+91 93081 89201 / +91 641 2400000",
+          googleMapsUrl: "https://maps.app.goo.gl/77AAPZ7hRje8Nrmk9",
+          railwayDistance: "Bhagalpur Junction Railway Station (BGP): ~2.5 km (10-15 mins drive)",
+        });
 
-          sendEmailNotification({
-            to: booking.customer.email,
-            subject: `Booking Confirmed (${booking.referenceId}) - Hotel Rajhans International`,
-            html: emailHtml,
-          }).catch((err) => console.error("Webhook email notification error:", err));
+        const recipientEmails = Array.from(
+          new Set([
+            booking.customer.email,
+            "info@hotelrajhansinternational.com",
+            "rajhansinternational.info@gmail.com",
+          ].filter(Boolean))
+        ).join(", ");
 
-          prisma.auditLog
-            .create({
-              data: {
-                userId: null,
-                userName: "System (Cashfree Webhook)",
-                action: "SEND_CONFIRMATION_EMAIL",
-                entity: "Booking",
-                entityId: booking.id,
-                details: `Webhook confirmation email dispatched for ${booking.customer.email}`,
-              },
-            })
-            .catch(() => {});
-        } catch (mailErr) {
-          console.error("Webhook email formatting error:", mailErr);
-        }
+        sendEmailNotification({
+          to: recipientEmails,
+          subject: `New Confirmed Booking (${booking.referenceId}) - Hotel Rajhans International`,
+          html: emailHtml,
+        }).catch((err) => console.error("Webhook email notification error:", err));
+
+        prisma.auditLog
+          .create({
+            data: {
+              userId: null,
+              userName: "System (Cashfree Webhook)",
+              action: "SEND_CONFIRMATION_EMAIL",
+              entity: "Booking",
+              entityId: booking.id,
+              details: `Webhook confirmation email dispatched to ${recipientEmails}`,
+            },
+          })
+          .catch(() => {});
+      } catch (mailErr) {
+        console.error("Webhook email formatting error:", mailErr);
       }
 
       // Non-blocking Google Sheets Synchronization
