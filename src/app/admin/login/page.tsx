@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@hotelrajhansinternational.com"
+                placeholder="rajhansinternational.info@gmail.com"
                 className="w-full bg-[#120d09] border border-[#d4af37]/35 focus:border-[#f0d699] rounded-xl py-3.5 pl-11 pr-4 text-sm text-[#ffffff] font-medium placeholder-[#a89678] focus:outline-none focus:ring-2 focus:ring-[#d4af37]/30 transition-all shadow-inner"
               />
             </div>

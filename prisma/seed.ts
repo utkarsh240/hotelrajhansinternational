@@ -6,43 +6,24 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding Hotel Rajhans International Database...");
 
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "admin123";
-  const managerPassword = process.env.SEED_MANAGER_PASSWORD || "manager123";
-
-  if (process.env.NODE_ENV === "production") {
-    if (!process.env.SEED_ADMIN_PASSWORD || !process.env.SEED_MANAGER_PASSWORD) {
-      throw new Error("SEED_ADMIN_PASSWORD and SEED_MANAGER_PASSWORD are required for production seeding.");
-    }
-  }
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "raj_int_hotel";
 
   // 1. Seed Super Admin User
   const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@hotelrajhansinternational.com" },
-    update: {},
+    where: { email: "rajhansinternational.info@gmail.com" },
+    update: {
+      passwordHash: adminPasswordHash,
+    },
     create: {
-      email: "admin@hotelrajhansinternational.com",
+      email: "rajhansinternational.info@gmail.com",
       name: "Hotel Administrator",
       passwordHash: adminPasswordHash,
       role: "SUPER_ADMIN",
       phone: "+91 93081 89201",
     },
   });
-  console.log("Created Admin user:", adminUser.email);
-
-  // 2. Seed Manager Account
-  const managerPasswordHash = await bcrypt.hash(managerPassword, 10);
-  await prisma.user.upsert({
-    where: { email: "manager@hotelrajhansinternational.com" },
-    update: {},
-    create: {
-      email: "manager@hotelrajhansinternational.com",
-      name: "Frontdesk Manager",
-      passwordHash: managerPasswordHash,
-      role: "MANAGER",
-      phone: "+91 93081 89202",
-    },
-  });
+  console.log("Created Super Admin user:", adminUser.email);
 
   // 3. Seed Rooms & Pricing
   const roomData = [
