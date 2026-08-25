@@ -54,9 +54,9 @@ export default function AdminReportsPage() {
 
   if (loading || !data) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-slate-700 space-y-4 font-sans">
-        <RefreshCw className="h-8 w-8 animate-spin" />
-        <p className="text-xs uppercase tracking-widest font-mono font-bold">Generating Analytical Reports...</p>
+      <div className="flex flex-col items-center justify-center py-24 text-slate-900 space-y-4 font-sans">
+        <RefreshCw className="h-8 w-8 animate-spin text-slate-900" />
+        <p className="text-xs uppercase tracking-widest font-mono font-bold text-slate-900">Generating Analytical Reports...</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function AdminReportsPage() {
           <h1 className="font-serif text-2xl md:text-3xl font-bold text-slate-900">
             Financial & Occupancy Reports
           </h1>
-          <p className="text-xs text-slate-500 mt-1 font-medium">
+          <p className="text-xs text-slate-700 mt-1 font-semibold">
             Export booking logs, tax summaries, and monthly performance statements.
           </p>
         </div>
@@ -88,23 +88,23 @@ export default function AdminReportsPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2">
-          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-700 font-bold">Total Lifetime Revenue</span>
-          <div className="text-3xl font-serif font-bold text-white">₹{metrics.totalRevenue.toLocaleString()}</div>
+          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-800 font-bold">Total Lifetime Revenue</span>
+          <div className="text-3xl font-serif font-bold text-slate-900">₹{metrics.totalRevenue.toLocaleString()}</div>
         </div>
 
         <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2">
-          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-700 font-bold">Pending Receivables</span>
-          <div className="text-3xl font-serif font-bold text-slate-700">₹{metrics.pendingPayments.toLocaleString()}</div>
+          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-800 font-bold">Pending Receivables</span>
+          <div className="text-3xl font-serif font-bold text-slate-900">₹{metrics.pendingPayments.toLocaleString()}</div>
         </div>
 
         <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2">
-          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-700 font-bold">Current Occupancy Rate</span>
-          <div className="text-3xl font-serif font-bold text-emerald-300">{metrics.occupancyRate}%</div>
+          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-800 font-bold">Current Occupancy Rate</span>
+          <div className="text-3xl font-serif font-bold text-emerald-800">{metrics.occupancyRate}%</div>
         </div>
 
         <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-2">
-          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-700 font-bold">Total Registered Rooms</span>
-          <div className="text-3xl font-serif font-bold text-blue-300">{metrics.totalRooms} Rooms</div>
+          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-800 font-bold">Total Registered Rooms</span>
+          <div className="text-3xl font-serif font-bold text-slate-900">{metrics.totalRooms} Rooms</div>
         </div>
       </div>
 
@@ -114,26 +114,26 @@ export default function AdminReportsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-amber-500/20 text-slate-700 uppercase tracking-widest text-[10px] font-bold">
-                <th className="py-3.5 px-4">Ref ID</th>
-                <th className="py-3.5 px-4">Guest</th>
-                <th className="py-3.5 px-4">Room</th>
-                <th className="py-3.5 px-4">Check-In</th>
-                <th className="py-3.5 px-4">Check-Out</th>
-                <th className="py-3.5 px-4">Net Amount</th>
-                <th className="py-3.5 px-4">Status</th>
+              <tr className="border-b border-amber-500/20 text-slate-900 uppercase tracking-widest text-[10px] font-extrabold">
+                <th className="py-3.5 px-4 text-slate-900">Ref ID</th>
+                <th className="py-3.5 px-4 text-slate-900">Guest</th>
+                <th className="py-3.5 px-4 text-slate-900">Room</th>
+                <th className="py-3.5 px-4 text-slate-900">Check-In</th>
+                <th className="py-3.5 px-4 text-slate-900">Check-Out</th>
+                <th className="py-3.5 px-4 text-slate-900">Net Amount</th>
+                <th className="py-3.5 px-4 text-slate-900">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-amber-500/10 text-slate-900">
               {data.recentBookings.map((b: any) => (
-                <tr key={b.id} className="hover:bg-slate-100 transition-colors">
-                  <td className="py-3.5 px-4 font-mono font-bold text-slate-700">{b.referenceId}</td>
-                  <td className="py-3.5 px-4 font-bold text-white">{b.customer?.name}</td>
-                  <td className="py-3.5 px-4 text-slate-900">{b.room?.name}</td>
-                  <td className="py-3.5 px-4 font-mono">{new Date(b.checkIn).toLocaleDateString()}</td>
-                  <td className="py-3.5 px-4 font-mono">{new Date(b.checkOut).toLocaleDateString()}</td>
-                  <td className="py-3.5 px-4 font-mono font-bold text-slate-700 text-sm">₹{b.netAmount.toLocaleString()}</td>
-                  <td className="py-3.5 px-4 font-mono text-[10px] uppercase font-bold text-slate-500">{b.status}</td>
+                <tr key={b.id} className="hover:bg-slate-100 transition-colors text-slate-900 font-medium">
+                  <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{b.referenceId}</td>
+                  <td className="py-3.5 px-4 font-bold text-slate-900">{b.customer?.name}</td>
+                  <td className="py-3.5 px-4 text-slate-900 font-semibold">{b.room?.name}</td>
+                  <td className="py-3.5 px-4 font-mono text-slate-900">{new Date(b.checkIn).toLocaleDateString()}</td>
+                  <td className="py-3.5 px-4 font-mono text-slate-900">{new Date(b.checkOut).toLocaleDateString()}</td>
+                  <td className="py-3.5 px-4 font-mono font-bold text-slate-900 text-sm">₹{b.netAmount.toLocaleString()}</td>
+                  <td className="py-3.5 px-4 font-mono text-[10px] uppercase font-extrabold text-slate-900">{b.status}</td>
                 </tr>
               ))}
             </tbody>

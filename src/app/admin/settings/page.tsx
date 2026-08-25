@@ -53,29 +53,29 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-slate-700 space-y-4 font-sans">
-        <RefreshCw className="h-8 w-8 animate-spin" />
-        <p className="text-xs uppercase tracking-widest font-mono font-bold">Loading System Configurations...</p>
+      <div className="flex flex-col items-center justify-center py-24 text-slate-900 space-y-4 font-sans">
+        <RefreshCw className="h-8 w-8 animate-spin text-slate-900" />
+        <p className="text-xs uppercase tracking-widest font-mono font-extrabold text-slate-900">Loading System Configurations...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 font-sans text-slate-900">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-2xl md:text-3xl font-bold text-slate-900">
             System & Tax Parameters
           </h1>
-          <p className="text-xs text-slate-500 mt-1 font-medium">
+          <p className="text-xs text-slate-700 mt-1 font-semibold">
             Super Admin operational rules, GSTIN number, check-in/out policies, and Cashfree configurations.
           </p>
         </div>
       </div>
 
       {successMsg && (
-        <div className="p-4 bg-emerald-900/40 border border-emerald-500/40 rounded-xl text-emerald-300 text-xs flex items-center gap-2 font-bold">
-          <CheckCircle className="h-4 w-4 text-emerald-400" /> {successMsg}
+        <div className="p-4 bg-emerald-100 border border-emerald-300 rounded-xl text-emerald-900 text-xs flex items-center gap-2 font-bold">
+          <CheckCircle className="h-4 w-4 text-emerald-700" /> {successMsg}
         </div>
       )}
 
@@ -87,7 +87,7 @@ export default function AdminSettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-700 font-bold mb-1">Official GSTIN Number</label>
+              <label className="block text-xs uppercase tracking-widest text-slate-900 font-bold mb-1">Official GSTIN Number</label>
               <input
                 type="text"
                 value={settings.gstin || "10AAAAA0000A1Z5"}
@@ -97,12 +97,12 @@ export default function AdminSettingsPage() {
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-700 font-bold mb-1">Cashfree Client ID</label>
+              <label className="block text-xs uppercase tracking-widest text-slate-900 font-bold mb-1">Cashfree Client ID</label>
               <input
                 type="text"
                 value="Configured in deployment environment"
                 disabled
-                className="w-full bg-slate-50/70 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-500 font-mono font-bold"
+                className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 font-mono font-bold"
               />
             </div>
           </div>
@@ -115,22 +115,22 @@ export default function AdminSettingsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-700 font-bold mb-1">Standard Check-In Time</label>
+              <label className="block text-xs uppercase tracking-widest text-slate-900 font-bold mb-1">Standard Check-In Time</label>
               <input
                 type="text"
                 value={settings.check_in_time || "12:00 PM"}
                 onChange={(e) => handleChange("check_in_time", e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 font-medium"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 font-semibold"
               />
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-widest text-slate-700 font-bold mb-1">Standard Check-Out Time</label>
+              <label className="block text-xs uppercase tracking-widest text-slate-900 font-bold mb-1">Standard Check-Out Time</label>
               <input
                 type="text"
                 value={settings.check_out_time || "11:00 AM"}
                 onChange={(e) => handleChange("check_out_time", e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 font-medium"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 font-semibold"
               />
             </div>
           </div>

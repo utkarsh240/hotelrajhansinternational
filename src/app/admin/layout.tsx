@@ -74,21 +74,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div>
           <div className="p-6 border-b border-slate-200 flex items-center justify-between">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-slate-100 text-slate-800 border border-slate-200">
-                <Hotel className="h-6 w-6" />
+              <div className="p-2 rounded-lg bg-slate-100 text-slate-900 border border-slate-200">
+                <Hotel className="h-6 w-6 text-slate-900" />
               </div>
               <div>
                 <h2 className="font-serif text-lg font-bold uppercase tracking-wider leading-tight text-slate-900">
                   Rajhans
                 </h2>
-                <p className="text-[9px] uppercase tracking-widest font-mono text-slate-500">
+                <p className="text-[9px] uppercase tracking-widest font-mono text-slate-800 font-bold">
                   Hotel HMS Admin
                 </p>
               </div>
             </Link>
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden p-1 text-slate-500 hover:text-slate-700"
+              className="lg:hidden p-1 text-slate-700 hover:text-slate-900"
             >
               <X className="h-5 w-5" />
             </button>
@@ -103,10 +103,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs uppercase tracking-wider font-bold transition-all ${
                     isActive
                       ? "bg-slate-900 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      : "text-slate-800 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
@@ -120,12 +120,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-4 border-t border-slate-200 space-y-3">
           {user && (
             <div className="flex items-center gap-3 px-2">
-              <div className="h-9 w-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-xs uppercase">
+              <div className="h-9 w-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 font-bold text-xs uppercase">
                 {user.name ? user.name[0] : "A"}
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs font-semibold truncate text-slate-900">{user.name}</p>
-                <span className="inline-block text-[9px] uppercase tracking-wider font-mono text-slate-500">
+                <p className="text-xs font-bold truncate text-slate-900">{user.name}</p>
+                <span className="inline-block text-[9px] uppercase tracking-wider font-mono text-slate-800 font-bold">
                   {user.role}
                 </span>
               </div>
@@ -134,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <button
             onClick={handleLogout}
-            className="w-full py-2 px-3 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full py-2 px-3 rounded-lg border border-red-300 text-red-700 hover:bg-red-50 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             title="Logout"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -148,7 +148,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100"
+              className="lg:hidden p-2 rounded-lg text-slate-900 hover:bg-slate-100"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -162,9 +162,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               href="/"
               target="_blank"
               rel="noreferrer"
-              className="text-xs uppercase font-bold tracking-widest border border-slate-300 text-slate-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-colors hover:bg-slate-100"
+              className="text-xs uppercase font-extrabold tracking-widest border border-slate-300 text-slate-900 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition-colors hover:bg-slate-100"
             >
-              <Globe className="h-3.5 w-3.5" /> View Public Site
+              <Globe className="h-3.5 w-3.5 text-slate-900" /> View Public Site
             </a>
           </div>
         </header>
