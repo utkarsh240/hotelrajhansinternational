@@ -49,12 +49,38 @@ export default function AdminPaymentsPage() {
             Real-time Cashfree payment logs, transaction verification, and gateway responses.
           </p>
         </div>
-        <button
-          onClick={fetchPayments}
-          className="p-2.5 rounded-xl border border-slate-300 text-slate-500 hover:bg-slate-100 text-xs flex items-center gap-2 cursor-pointer self-start font-semibold"
-        >
-          <RefreshCw className={`h-4 w-4 text-slate-700 ${loading ? "animate-spin" : ""}`} /> Refresh Log
-        </button>
+        <div className="flex items-center gap-2 self-start">
+          <button
+            onClick={fetchPayments}
+            className="p-2.5 rounded-xl border border-slate-300 text-slate-500 hover:bg-slate-100 text-xs flex items-center gap-2 cursor-pointer font-semibold"
+          >
+            <RefreshCw className={`h-4 w-4 text-slate-700 ${loading ? "animate-spin" : ""}`} /> Refresh Log
+          </button>
+          <button
+            onClick={async () => {
+              if (confirm("Are you sure you want to clear all test payment logs and reset financial metrics to zero?")) {
+                setLoading(true);
+                try {
+                  const res = await fetch("/api/payments/reset", { method: "POST" });
+                  const data = await res.json();
+                  if (data.success) {
+                    alert("Payment values reset successfully!");
+                    fetchPayments();
+                  } else {
+                    alert(data.error || "Failed to reset payments.");
+                  }
+                } catch {
+                  alert("Error resetting payments.");
+                } finally {
+                  setLoading(false);
+                }
+              }
+            }}
+            className="p-2.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs flex items-center gap-1.5 cursor-pointer font-semibold"
+          >
+            Reset Payment Data
+          </button>
+        </div>
       </div>
 
       <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden">
