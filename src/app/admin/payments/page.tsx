@@ -9,17 +9,11 @@ export default function AdminPaymentsPage() {
 
   const fetchPayments = () => {
     setLoading(true);
-    fetch("/api/reports")
+    fetch("/api/payments")
       .then((res) => res.json())
       .then((d) => {
-        if (d.success && d.recentBookings) {
-          const list: any[] = [];
-          d.recentBookings.forEach((b: any) => {
-            if (b.payments && b.payments.length > 0) {
-              b.payments.forEach((p: any) => list.push({ ...p, bookingRef: b.referenceId, customerName: b.customer?.name }));
-            }
-          });
-          setPayments(list);
+        if (d.success && d.payments) {
+          setPayments(d.payments);
         }
       })
       .catch(console.error)
@@ -29,6 +23,20 @@ export default function AdminPaymentsPage() {
   useEffect(() => {
     fetchPayments();
   }, []);
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "SUCCESS":
+        return "bg-emerald-500/20 text-emerald-700 border-emerald-500/40";
+      case "PENDING":
+        return "bg-amber-500/20 text-amber-700 border-amber-500/40";
+      case "FAILED":
+      case "REFUNDED":
+        return "bg-rose-500/20 text-rose-700 border-rose-500/40";
+      default:
+        return "bg-slate-500/20 text-slate-700 border-slate-500/40";
+    }
+  };
 
   return (
     <div className="space-y-6 font-sans">
@@ -74,13 +82,15 @@ export default function AdminPaymentsPage() {
               ) : payments.length > 0 ? (
                 payments.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-100 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-slate-700 font-bold">{p.cashfreePaymentId || p.id}</td>
+                    <td className="py-3.5 px-4 font-mono text-slate-700 font-bold">
+                      {p.cashfreePaymentId || p.cashfreeOrderId || p.id}
+                    </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{p.bookingRef}</td>
                     <td className="py-3.5 px-4 font-bold text-slate-900">{p.customerName}</td>
                     <td className="py-3.5 px-4 font-mono text-[10px] uppercase font-bold text-slate-500">{p.method}</td>
                     <td className="py-3.5 px-4 font-mono font-bold text-slate-700 text-sm">₹{p.amount.toLocaleString()}</td>
                     <td className="py-3.5 px-4">
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider border ${getStatusBadge(p.status)}`}>
                         {p.status}
                       </span>
                     </td>
